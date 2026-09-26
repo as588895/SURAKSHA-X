@@ -563,3 +563,57 @@ button {
     font-size: 25px;
   }
 }
+
+/* ============================= */
+/* STEP 28 - HAZARD SEARCH/FILTER */
+/* ============================= */
+
+.hazard-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin: 20px 0 10px;
+}
+
+.hazard-filters input,
+.hazard-filters select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 15px;
+}
+
+.hazard-filters input::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.hazard-filters input:focus,
+.hazard-filters select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.filter-result {
+  margin: 10px 0 20px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .hazard-filters {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .hazard-filters input,
+  .hazard-filters select {
+    font-size: 14px;
+  }
+}
