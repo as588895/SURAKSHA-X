@@ -1,0 +1,426 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 30px 20px;
+  background: #111827;
+  color: white;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.header p {
+  margin-top: 8px;
+  color: #d1d5db;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 20px;
+}
+
+.section {
+  background: white;
+  padding: 24px;
+  margin-bottom: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* FORM */
+
+.hazard-form {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 15px;
+}
+
+.hazard-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.hazard-form input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.primary-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
+/* MAP */
+
+.map-wrapper {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* CARDS */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    3,
+    minmax(0, 1fr)
+  );
+  gap: 20px;
+}
+
+.hazard-card,
+.safe-card,
+.info-card {
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.hazard-card h3,
+.safe-card h3,
+.info-card h3 {
+  margin-top: 0;
+}
+
+.hazard-card p,
+.safe-card p,
+.info-card p {
+  margin: 8px 0;
+  word-break: break-word;
+}
+
+/* BUTTONS */
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.button-group button {
+  border: none;
+  padding: 9px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: white;
+}
+
+.update-btn {
+  background: #2563eb;
+}
+
+.delete-btn {
+  background: #dc2626;
+}
+
+.relocation-btn {
+  background: #059669;
+}
+
+/* RELOCATION */
+
+.relocation-section {
+  border: 2px solid #059669;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.close-btn {
+  border: none;
+  background: #6b7280;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.relocation-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 20px;
+}
+
+.recommendation {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.recommendation h3 {
+  margin-top: 0;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  }
+
+  .hazard-form {
+    grid-template-columns: 1fr;
+  }
+
+  .relocation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .section {
+    padding: 16px;
+    margin-bottom: 15px;
+  }
+
+  .header {
+    padding: 22px 15px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .header p {
+    font-size: 14px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+
+  .section-title {
+    align-items: flex-start;
+  }
+
+  .map-wrapper {
+    margin: 0;
+  }
+}
+
+/* ============================= */
+/* STEP 25 RELOCATION PLAN */
+/* ============================= */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.section-subtitle {
+  margin-top: -10px;
+  color: #6b7280;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.summary-card {
+  padding: 20px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.summary-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.summary-card strong {
+  font-size: 28px;
+}
+
+.hazard-summary {
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.hazard-summary h3 {
+  margin-top: 0;
+}
+
+.plan-heading {
+  margin-top: 25px;
+}
+
+.relocation-plan {
+  display: grid;
+  gap: 15px;
+}
+
+.relocation-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.location-number {
+  min-width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.location-info {
+  flex: 1;
+}
+
+.location-info h3 {
+  margin-top: 0;
+}
+
+.location-info p {
+  margin: 7px 0;
+}
+
+.assigned {
+  font-size: 16px;
+}
+
+.recommendation {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.recommendation h3 {
+  margin-top: 0;
+}
+
+.recommendation.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.recommendation.warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.close-btn {
+  border: none;
+  background: #6b7280;
+  color: white;
+  padding: 9px 15px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #4b5563;
+}
+
+.relocation-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .section-title {
+    align-items: flex-start;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .relocation-card {
+    flex-direction: column;
+  }
+
+  .location-number {
+    min-width: 32px;
+    height: 32px;
+  }
+
+}
