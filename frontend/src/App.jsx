@@ -25,6 +25,9 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("ALL");
 
+  // STEP 30
+  const [selectedHazard, setSelectedHazard] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -238,6 +241,19 @@ function App() {
   };
 
   // ===============================
+  // STEP 30
+  // HAZARD DETAILS
+  // ===============================
+
+  const handleViewDetails = (hazard) => {
+    setSelectedHazard(hazard);
+  };
+
+  const closeHazardDetails = () => {
+    setSelectedHazard(null);
+  };
+
+  // ===============================
   // STEP 28
   // HAZARD SEARCH & FILTER
   // ===============================
@@ -263,180 +279,300 @@ function App() {
   return (
     <div className="app">
 
+      {/* ================================= */}
+      {/* STEP 30 - HAZARD DETAILS MODAL */}
+      {/* ================================= */}
+
+      {selectedHazard && (
+        <div className="modal-overlay">
+
+          <div className="hazard-modal">
+
+            <div className="modal-header">
+
+              <div>
+                <h2>🚨 Hazard Details</h2>
+
+                <p>
+                  Complete information about this hazard
+                </p>
+              </div>
+
+              <button
+                className="modal-close"
+                onClick={closeHazardDetails}
+              >
+                ✕
+              </button>
+
+            </div>
+
+            <div className="modal-content">
+
+              <div className="detail-item">
+                <span>Hazard Name</span>
+
+                <strong>
+                  {selectedHazard.name}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Hazard Type</span>
+
+                <strong>
+                  {selectedHazard.type}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Severity</span>
+
+                <strong>
+                  {selectedHazard.severity}/100
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Affected Population</span>
+
+                <strong>
+                  {selectedHazard.population}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Risk Score</span>
+
+                <strong>
+                  {selectedHazard.riskScore}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Risk Level</span>
+
+                <strong
+                  className={`risk-text risk-${selectedHazard.riskLevel?.toLowerCase()}`}
+                >
+                  {selectedHazard.riskLevel}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Latitude</span>
+
+                <strong>
+                  {selectedHazard.latitude ?? "N/A"}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>Longitude</span>
+
+                <strong>
+                  {selectedHazard.longitude ?? "N/A"}
+                </strong>
+              </div>
+
+            </div>
+
+            <div className="modal-footer">
+
+              <button
+                className="close-btn"
+                onClick={closeHazardDetails}
+              >
+                Close
+              </button>
+
+              <button
+                className="relocation-btn"
+                onClick={() => {
+                  closeHazardDetails();
+                  handleRelocation(selectedHazard);
+                }}
+              >
+                Find Safe Location
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ================================= */}
+      {/* RELOCATION PLAN */}
+      {/* ================================= */}
+
+      {relocationData && (
+        <section className="section relocation-section">
+
+          <div className="section-title">
+
+            <div>
+              <h2>🚨 Relocation Plan</h2>
+
+              <p className="section-subtitle">
+                Smart relocation recommendation based
+                on distance and available capacity.
+              </p>
+            </div>
+
+            <button
+              className="close-btn"
+              onClick={closeRelocation}
+            >
+              Close
+            </button>
+
+          </div>
+
+          <div className="summary-grid">
+
+            <div className="summary-card">
+              <span>
+                Affected Population
+              </span>
+
+              <strong>
+                {relocationData.totalAffectedPopulation}
+              </strong>
+            </div>
+
+            <div className="summary-card">
+              <span>
+                Total Relocated
+              </span>
+
+              <strong>
+                {relocationData.totalRelocatedPopulation}
+              </strong>
+            </div>
+
+            <div className="summary-card">
+              <span>
+                Remaining
+              </span>
+
+              <strong>
+                {relocationData.remainingPopulation}
+              </strong>
+            </div>
+
+          </div>
+
+          <div className="hazard-summary">
+
+            <h3>Hazard Information</h3>
+
+            <p>
+              <strong>Name:</strong>{" "}
+              {relocationData.hazard.name}
+            </p>
+
+            <p>
+              <strong>Risk Level:</strong>{" "}
+              {relocationData.hazard.riskLevel}
+            </p>
+
+          </div>
+
+          <h3 className="plan-heading">
+            Safe Location Allocation
+          </h3>
+
+          <div className="relocation-plan">
+
+            {relocationData.relocationPlan.map(
+              (location, index) => (
+
+                <div
+                  className="relocation-card"
+                  key={location.locationId}
+                >
+
+                  <div className="location-number">
+                    {index + 1}
+                  </div>
+
+                  <div className="location-info">
+
+                    <h3>
+                      🏠 {location.locationName}
+                    </h3>
+
+                    <p>
+                      <strong>Type:</strong>{" "}
+                      {location.type}
+                    </p>
+
+                    <p>
+                      <strong>Distance:</strong>{" "}
+                      {location.distance} km
+                    </p>
+
+                    <p>
+                      <strong>
+                        Available Capacity:
+                      </strong>{" "}
+                      {location.availableCapacity}
+                    </p>
+
+                    <p className="assigned">
+                      <strong>
+                        People Assigned:
+                      </strong>{" "}
+                      {location.peopleToRelocate}
+                    </p>
+
+                  </div>
+
+                </div>
+              )
+            )}
+
+          </div>
+
+          <div
+            className={
+              relocationData.remainingPopulation === 0
+                ? "recommendation success"
+                : "recommendation warning"
+            }
+          >
+
+            <h3>
+              {relocationData.remainingPopulation === 0
+                ? "✅"
+                : "⚠️"}{" "}
+              Recommendation
+            </h3>
+
+            <p>
+              {relocationData.recommendation}
+            </p>
+
+          </div>
+
+        </section>
+      )}
+
       {/* HEADER */}
 
       <header className="header">
+
         <h1>SURAKSHA-X</h1>
 
         <p>
           Hazard Detection & Relocation Management System
         </p>
+
       </header>
 
       <main className="container">
-
-        {/* RELOCATION PLAN */}
-
-        {relocationData && (
-          <section className="section relocation-section">
-
-            <div className="section-title">
-
-              <div>
-                <h2>🚨 Relocation Plan</h2>
-
-                <p className="section-subtitle">
-                  Smart relocation recommendation based
-                  on distance and available capacity.
-                </p>
-              </div>
-
-              <button
-                className="close-btn"
-                onClick={closeRelocation}
-              >
-                Close
-              </button>
-
-            </div>
-
-            {/* SUMMARY */}
-
-            <div className="summary-grid">
-
-              <div className="summary-card">
-                <span>
-                  Affected Population
-                </span>
-
-                <strong>
-                  {relocationData.totalAffectedPopulation}
-                </strong>
-              </div>
-
-              <div className="summary-card">
-                <span>
-                  Total Relocated
-                </span>
-
-                <strong>
-                  {relocationData.totalRelocatedPopulation}
-                </strong>
-              </div>
-
-              <div className="summary-card">
-                <span>
-                  Remaining
-                </span>
-
-                <strong>
-                  {relocationData.remainingPopulation}
-                </strong>
-              </div>
-
-            </div>
-
-            {/* HAZARD INFORMATION */}
-
-            <div className="hazard-summary">
-
-              <h3>Hazard Information</h3>
-
-              <p>
-                <strong>Name:</strong>{" "}
-                {relocationData.hazard.name}
-              </p>
-
-              <p>
-                <strong>Risk Level:</strong>{" "}
-                {relocationData.hazard.riskLevel}
-              </p>
-
-            </div>
-
-            {/* RELOCATION PLAN */}
-
-            <h3 className="plan-heading">
-              Safe Location Allocation
-            </h3>
-
-            <div className="relocation-plan">
-
-              {relocationData.relocationPlan.map(
-                (location, index) => (
-
-                  <div
-                    className="relocation-card"
-                    key={location.locationId}
-                  >
-
-                    <div className="location-number">
-                      {index + 1}
-                    </div>
-
-                    <div className="location-info">
-
-                      <h3>
-                        🏠 {location.locationName}
-                      </h3>
-
-                      <p>
-                        <strong>Type:</strong>{" "}
-                        {location.type}
-                      </p>
-
-                      <p>
-                        <strong>Distance:</strong>{" "}
-                        {location.distance} km
-                      </p>
-
-                      <p>
-                        <strong>
-                          Available Capacity:
-                        </strong>{" "}
-                        {location.availableCapacity}
-                      </p>
-
-                      <p className="assigned">
-                        <strong>
-                          People Assigned:
-                        </strong>{" "}
-                        {location.peopleToRelocate}
-                      </p>
-
-                    </div>
-
-                  </div>
-                )
-              )}
-
-            </div>
-
-            {/* RECOMMENDATION */}
-
-            <div
-              className={
-                relocationData.remainingPopulation === 0
-                  ? "recommendation success"
-                  : "recommendation warning"
-              }
-            >
-
-              <h3>
-                {relocationData.remainingPopulation === 0
-                  ? "✅"
-                  : "⚠️"}{" "}
-                Recommendation
-              </h3>
-
-              <p>
-                {relocationData.recommendation}
-              </p>
-
-            </div>
-
-          </section>
-        )}
 
         {/* ADD HAZARD */}
 
@@ -445,11 +581,13 @@ function App() {
           <div className="section-title">
 
             <div>
+
               <h2>➕ Add New Hazard</h2>
 
               <p className="section-subtitle">
                 Enter hazard details to add a new risk zone
               </p>
+
             </div>
 
           </div>
@@ -539,47 +677,31 @@ function App() {
 
             <div className="stat-card">
               <h3>Total Hazards</h3>
-
-              <p>
-                {dashboardStats.totalHazards}
-              </p>
+              <p>{dashboardStats.totalHazards}</p>
             </div>
 
             <div className="stat-card">
               <h3>Critical Hazards</h3>
-
-              <p>
-                {dashboardStats.criticalHazards}
-              </p>
+              <p>{dashboardStats.criticalHazards}</p>
             </div>
 
             <div className="stat-card">
               <h3>High Risk Hazards</h3>
-
-              <p>
-                {dashboardStats.highHazards}
-              </p>
+              <p>{dashboardStats.highHazards}</p>
             </div>
 
             <div className="stat-card">
               <h3>Moderate Hazards</h3>
-
-              <p>
-                {dashboardStats.moderateHazards}
-              </p>
+              <p>{dashboardStats.moderateHazards}</p>
             </div>
 
             <div className="stat-card">
               <h3>Low Risk Hazards</h3>
-
-              <p>
-                {dashboardStats.lowHazards}
-              </p>
+              <p>{dashboardStats.lowHazards}</p>
             </div>
 
             <div className="stat-card">
               <h3>Affected Population</h3>
-
               <p>
                 {dashboardStats.totalAffectedPopulation}
               </p>
@@ -612,7 +734,7 @@ function App() {
 
           <h2>Hazards</h2>
 
-          {/* STEP 28 SEARCH + FILTER */}
+          {/* SEARCH + FILTER */}
 
           <div className="hazard-filters">
 
@@ -668,9 +790,9 @@ function App() {
               filteredHazards.map((hazard) => (
 
                 <div
-  className={`hazard-card risk-${hazard.riskLevel?.toLowerCase()}`}
-  key={hazard._id}
->
+                  className={`hazard-card risk-${hazard.riskLevel?.toLowerCase()}`}
+                  key={hazard._id}
+                >
 
                   <h3>{hazard.name}</h3>
 
@@ -708,6 +830,17 @@ function App() {
                       }
                     >
                       Update
+                    </button>
+
+                    {/* STEP 30 */}
+
+                    <button
+                      className="details-btn"
+                      onClick={() =>
+                        handleViewDetails(hazard)
+                      }
+                    >
+                      View Details
                     </button>
 
                     <button
@@ -811,3 +944,4 @@ function App() {
 }
 
 export default App;
+
