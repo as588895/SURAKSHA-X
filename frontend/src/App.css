@@ -2,15 +2,33 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f5f7fa;
+  color: #111827;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  transition: 0.2s ease;
 }
 
 .app {
   min-height: 100vh;
 }
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
 
 .header {
   text-align: center;
@@ -29,12 +47,20 @@ body {
   color: #d1d5db;
 }
 
+/* ============================= */
+/* MAIN CONTAINER */
+/* ============================= */
+
 .container {
   width: 100%;
   max-width: 1400px;
   margin: auto;
   padding: 20px;
 }
+
+/* ============================= */
+/* SECTION */
+/* ============================= */
 
 .section {
   background: white;
@@ -49,28 +75,38 @@ body {
   margin-bottom: 20px;
 }
 
+/* ============================= */
 /* FORM */
+/* ============================= */
 
 .hazard-form {
   display: grid;
-  grid-template-columns: repeat(
-    2,
-    minmax(0, 1fr)
-  );
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 15px;
 }
 
 .hazard-form input {
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 15px;
+  background: #ffffff;
+  color: #111827;
+  caret-color: #111827;
+}
+
+.hazard-form input::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
 
 .hazard-form input:focus {
   outline: none;
   border-color: #2563eb;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
 .primary-btn {
@@ -81,13 +117,55 @@ body {
   color: white;
   font-size: 15px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .primary-btn:hover {
   background: #1d4ed8;
 }
 
+/* ============================= */
+/* DASHBOARD STATS */
+/* ============================= */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px 0 10px;
+}
+
+.stat-card {
+  padding: 22px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  color: #374151;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ============================= */
 /* MAP */
+/* ============================= */
 
 .map-wrapper {
   width: 100%;
@@ -95,14 +173,13 @@ body {
   border-radius: 10px;
 }
 
+/* ============================= */
 /* CARDS */
+/* ============================= */
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(
-    3,
-    minmax(0, 1fr)
-  );
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
@@ -119,6 +196,7 @@ body {
 .safe-card h3,
 .info-card h3 {
   margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .hazard-card p,
@@ -128,7 +206,9 @@ body {
   word-break: break-word;
 }
 
+/* ============================= */
 /* BUTTONS */
+/* ============================= */
 
 .button-group {
   display: flex;
@@ -143,146 +223,100 @@ body {
   border-radius: 7px;
   cursor: pointer;
   color: white;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .update-btn {
   background: #2563eb;
 }
 
+.update-btn:hover {
+  background: #1d4ed8;
+}
+
 .delete-btn {
   background: #dc2626;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
 }
 
 .relocation-btn {
   background: #059669;
 }
 
-/* RELOCATION */
+.relocation-btn:hover {
+  background: #047857;
+}
+
+.relocation-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================= */
+/* RELOCATION SECTION */
+/* ============================= */
 
 .relocation-section {
   border: 2px solid #059669;
 }
 
+/* ============================= */
+/* ADD NEW HAZARD TITLE */
+/* ============================= */
+
 .section-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.section-title h2 {
+  margin: 0 0 8px 0;
+  padding: 0;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}
+
+.section-subtitle {
+  margin: 0;
+  padding: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 
 .close-btn {
   border: none;
   background: #6b7280;
   color: white;
-  padding: 8px 14px;
+  padding: 9px 15px;
   border-radius: 7px;
   cursor: pointer;
 }
 
-.relocation-grid {
-  display: grid;
-  grid-template-columns: repeat(
-    2,
-    minmax(0, 1fr)
-  );
-  gap: 20px;
-}
-
-.recommendation {
-  margin-top: 20px;
-  padding: 18px;
-  border-radius: 10px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-}
-
-.recommendation h3 {
-  margin-top: 0;
-}
-
-/* TABLET */
-
-@media (max-width: 900px) {
-  .card-grid {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
-  }
-
-  .hazard-form {
-    grid-template-columns: 1fr;
-  }
-
-  .relocation-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-  .container {
-    padding: 10px;
-  }
-
-  .section {
-    padding: 16px;
-    margin-bottom: 15px;
-  }
-
-  .header {
-    padding: 22px 15px;
-  }
-
-  .header h1 {
-    font-size: 26px;
-  }
-
-  .header p {
-    font-size: 14px;
-  }
-
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .button-group {
-    flex-direction: column;
-  }
-
-  .button-group button {
-    width: 100%;
-  }
-
-  .section-title {
-    align-items: flex-start;
-  }
-
-  .map-wrapper {
-    margin: 0;
-  }
+.close-btn:hover {
+  background: #4b5563;
 }
 
 /* ============================= */
-/* STEP 25 RELOCATION PLAN */
+/* RELOCATION SUMMARY */
 /* ============================= */
-
-.section-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.section-subtitle {
-  margin-top: -10px;
-  color: #6b7280;
-}
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 15px;
   margin: 20px 0;
 }
@@ -304,7 +338,12 @@ body {
 
 .summary-card strong {
   font-size: 28px;
+  color: #111827;
 }
+
+/* ============================= */
+/* HAZARD SUMMARY */
+/* ============================= */
 
 .hazard-summary {
   padding: 20px;
@@ -320,6 +359,10 @@ body {
 .plan-heading {
   margin-top: 25px;
 }
+
+/* ============================= */
+/* RELOCATION PLAN */
+/* ============================= */
 
 .relocation-plan {
   display: grid;
@@ -364,6 +407,10 @@ body {
   font-size: 16px;
 }
 
+/* ============================= */
+/* RECOMMENDATION */
+/* ============================= */
+
 .recommendation {
   margin-top: 20px;
   padding: 20px;
@@ -384,30 +431,84 @@ body {
   border: 1px solid #fde68a;
 }
 
-.close-btn {
-  border: none;
-  background: #6b7280;
-  color: white;
-  padding: 9px 15px;
-  border-radius: 7px;
-  cursor: pointer;
+/* ============================= */
+/* TABLET */
+/* ============================= */
+
+@media (max-width: 1000px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hazard-form {
+    grid-template-columns: 1fr;
+  }
 }
 
-.close-btn:hover {
-  background: #4b5563;
-}
-
-.relocation-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
+/* ============================= */
 /* MOBILE */
+/* ============================= */
 
 @media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .section {
+    padding: 16px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
+
+  .header {
+    padding: 22px 15px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .header p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+
+  .stat-card p {
+    font-size: 28px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
 
   .section-title {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .close-btn {
+    width: 100%;
   }
 
   .summary-grid {
@@ -423,4 +524,42 @@ body {
     height: 32px;
   }
 
+  .map-wrapper {
+    margin: 0;
+  }
+
+  .hazard-form input,
+  .primary-btn {
+    font-size: 14px;
+  }
+}
+
+/* ============================= */
+/* SMALL MOBILE */
+/* ============================= */
+
+@media (max-width: 400px) {
+  .container {
+    padding: 7px;
+  }
+
+  .section {
+    padding: 13px;
+  }
+
+  .header h1 {
+    font-size: 23px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .stat-card h3 {
+    font-size: 15px;
+  }
+
+  .stat-card p {
+    font-size: 25px;
+  }
 }
