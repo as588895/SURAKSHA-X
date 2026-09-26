@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 const hazardRoutes = require("./routes/hazardRoutes");
-const safeLocationRoutes = require("./routes/safeLocationRoutes");  
+const safeLocationRoutes = require("./routes/safeLocationRoutes");
 const relocationRoutes = require("./routes/relocationRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -12,14 +13,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/hazards", hazardRoutes);
-app.use(
-  "/api/safe-locations",
-  safeLocationRoutes
-);
-app.use(
-  "/api/relocation",
-  relocationRoutes
-);
+app.use("/api/safe-locations", safeLocationRoutes);
+app.use("/api/relocation", relocationRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)
