@@ -19,7 +19,8 @@ function App() {
 
   const [relocationData, setRelocationData] = useState(null);
 
-  const [loadingRelocation, setLoadingRelocation] = useState(false);
+  const [loadingRelocation, setLoadingRelocation] =
+    useState(false);
 
   // STEP 28
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,6 +28,10 @@ function App() {
 
   // STEP 30
   const [selectedHazard, setSelectedHazard] = useState(null);
+
+  // STEP 32
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -49,7 +54,10 @@ function App() {
 
       setHazards(response.data);
     } catch (error) {
-      console.error("Failed to fetch hazards:", error);
+      console.error(
+        "Failed to fetch hazards:",
+        error
+      );
     }
   };
 
@@ -110,6 +118,9 @@ function App() {
       ...formData,
       [event.target.name]: event.target.value,
     });
+
+    setFormError("");
+    setFormSuccess("");
   };
 
   // ===============================
@@ -118,6 +129,9 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    setFormError("");
+    setFormSuccess("");
 
     try {
       await axios.post(
@@ -140,13 +154,24 @@ function App() {
         longitude: "",
       });
 
+      setFormSuccess(
+        "Hazard added successfully!"
+      );
+
       fetchHazards();
       fetchDashboardStats();
+
     } catch (error) {
       console.error(
         "Failed to create hazard:",
         error
       );
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to create hazard";
+
+      setFormError(message);
     }
   };
 
@@ -162,6 +187,7 @@ function App() {
 
       fetchHazards();
       fetchDashboardStats();
+
     } catch (error) {
       console.error(
         "Failed to delete hazard:",
@@ -194,6 +220,7 @@ function App() {
 
       fetchHazards();
       fetchDashboardStats();
+
     } catch (error) {
       console.error(
         "Failed to update hazard:",
@@ -220,6 +247,7 @@ function App() {
         top: 0,
         behavior: "smooth",
       });
+
     } catch (error) {
       console.error(
         "Failed to fetch relocation plan:",
@@ -227,6 +255,7 @@ function App() {
       );
 
       setRelocationData(null);
+
     } finally {
       setLoadingRelocation(false);
     }
@@ -258,19 +287,26 @@ function App() {
   // HAZARD SEARCH & FILTER
   // ===============================
 
-  const filteredHazards = hazards.filter((hazard) => {
-    const search = searchTerm.toLowerCase().trim();
+  const filteredHazards = hazards.filter(
+    (hazard) => {
+      const search =
+        searchTerm.toLowerCase().trim();
 
-    const matchesSearch =
-      hazard.name?.toLowerCase().includes(search) ||
-      hazard.type?.toLowerCase().includes(search);
+      const matchesSearch =
+        hazard.name
+          ?.toLowerCase()
+          .includes(search) ||
+        hazard.type
+          ?.toLowerCase()
+          .includes(search);
 
-    const matchesRisk =
-      riskFilter === "ALL" ||
-      hazard.riskLevel === riskFilter;
+      const matchesRisk =
+        riskFilter === "ALL" ||
+        hazard.riskLevel === riskFilter;
 
-    return matchesSearch && matchesRisk;
-  });
+      return matchesSearch && matchesRisk;
+    }
+  );
 
   // ===============================
   // UI
@@ -413,12 +449,14 @@ function App() {
           <div className="section-title">
 
             <div>
+
               <h2>🚨 Relocation Plan</h2>
 
               <p className="section-subtitle">
                 Smart relocation recommendation based
                 on distance and available capacity.
               </p>
+
             </div>
 
             <button
@@ -531,6 +569,7 @@ function App() {
                   </div>
 
                 </div>
+
               )
             )}
 
@@ -592,6 +631,20 @@ function App() {
 
           </div>
 
+          {/* STEP 32 - VALIDATION MESSAGES */}
+
+          {formError && (
+            <div className="form-error">
+              ⚠️ {formError}
+            </div>
+          )}
+
+          {formSuccess && (
+            <div className="form-success">
+              ✅ {formSuccess}
+            </div>
+          )}
+
           <form
             className="hazard-form"
             onSubmit={handleSubmit}
@@ -643,6 +696,8 @@ function App() {
               placeholder="Latitude"
               value={formData.latitude}
               onChange={handleChange}
+              min="-90"
+              max="90"
               required
             />
 
@@ -653,6 +708,8 @@ function App() {
               placeholder="Longitude"
               value={formData.longitude}
               onChange={handleChange}
+              min="-180"
+              max="180"
               required
             />
 
@@ -677,27 +734,37 @@ function App() {
 
             <div className="stat-card">
               <h3>Total Hazards</h3>
-              <p>{dashboardStats.totalHazards}</p>
+              <p>
+                {dashboardStats.totalHazards}
+              </p>
             </div>
 
             <div className="stat-card">
               <h3>Critical Hazards</h3>
-              <p>{dashboardStats.criticalHazards}</p>
+              <p>
+                {dashboardStats.criticalHazards}
+              </p>
             </div>
 
             <div className="stat-card">
               <h3>High Risk Hazards</h3>
-              <p>{dashboardStats.highHazards}</p>
+              <p>
+                {dashboardStats.highHazards}
+              </p>
             </div>
 
             <div className="stat-card">
               <h3>Moderate Hazards</h3>
-              <p>{dashboardStats.moderateHazards}</p>
+              <p>
+                {dashboardStats.moderateHazards}
+              </p>
             </div>
 
             <div className="stat-card">
               <h3>Low Risk Hazards</h3>
-              <p>{dashboardStats.lowHazards}</p>
+              <p>
+                {dashboardStats.lowHazards}
+              </p>
             </div>
 
             <div className="stat-card">
@@ -832,8 +899,6 @@ function App() {
                       Update
                     </button>
 
-                    {/* STEP 30 */}
-
                     <button
                       className="details-btn"
                       onClick={() =>
@@ -944,4 +1009,3 @@ function App() {
 }
 
 export default App;
-
