@@ -21,6 +21,10 @@ function App() {
 
   const [loadingRelocation, setLoadingRelocation] = useState(false);
 
+  // STEP 28
+  const [searchTerm, setSearchTerm] = useState("");
+  const [riskFilter, setRiskFilter] = useState("ALL");
+
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -234,6 +238,25 @@ function App() {
   };
 
   // ===============================
+  // STEP 28
+  // HAZARD SEARCH & FILTER
+  // ===============================
+
+  const filteredHazards = hazards.filter((hazard) => {
+    const search = searchTerm.toLowerCase().trim();
+
+    const matchesSearch =
+      hazard.name?.toLowerCase().includes(search) ||
+      hazard.type?.toLowerCase().includes(search);
+
+    const matchesRisk =
+      riskFilter === "ALL" ||
+      hazard.riskLevel === riskFilter;
+
+    return matchesSearch && matchesRisk;
+  });
+
+  // ===============================
   // UI
   // ===============================
 
@@ -384,7 +407,6 @@ function App() {
                     </div>
 
                   </div>
-
                 )
               )}
 
@@ -421,13 +443,16 @@ function App() {
         <section className="section">
 
           <div className="section-title">
-  <div>
-    <h2>➕ Add New Hazard</h2>
-    <p className="section-subtitle">
-      Enter hazard details to add a new risk zone
-    </p>
-  </div>
-</div>
+
+            <div>
+              <h2>➕ Add New Hazard</h2>
+
+              <p className="section-subtitle">
+                Enter hazard details to add a new risk zone
+              </p>
+            </div>
+
+          </div>
 
           <form
             className="hazard-form"
@@ -571,10 +596,12 @@ function App() {
           <h2>Hazard Map</h2>
 
           <div className="map-wrapper">
+
             <Map
               hazards={hazards}
               safeLocations={safeLocations}
             />
+
           </div>
 
         </section>
@@ -585,79 +612,145 @@ function App() {
 
           <h2>Hazards</h2>
 
+          {/* STEP 28 SEARCH + FILTER */}
+
+          <div className="hazard-filters">
+
+            <input
+              type="text"
+              placeholder="🔍 Search by hazard name or type..."
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(event.target.value)
+              }
+            />
+
+            <select
+              value={riskFilter}
+              onChange={(event) =>
+                setRiskFilter(event.target.value)
+              }
+            >
+
+              <option value="ALL">
+                All Risk Levels
+              </option>
+
+              <option value="LOW">
+                🟢 Low
+              </option>
+
+              <option value="MODERATE">
+                🟡 Moderate
+              </option>
+
+              <option value="HIGH">
+                🟠 High
+              </option>
+
+              <option value="CRITICAL">
+                🔴 Critical
+              </option>
+
+            </select>
+
+          </div>
+
+          <p className="filter-result">
+            Showing {filteredHazards.length} of{" "}
+            {hazards.length} hazards
+          </p>
+
           <div className="card-grid">
 
-            {hazards.map((hazard) => (
+            {filteredHazards.length > 0 ? (
 
-              <div
-                className="hazard-card"
-                key={hazard._id}
-              >
+              filteredHazards.map((hazard) => (
 
-                <h3>{hazard.name}</h3>
+                <div
+  className={`hazard-card risk-${hazard.riskLevel?.toLowerCase()}`}
+  key={hazard._id}
+>
 
-                <p>
-                  <strong>Type:</strong>{" "}
-                  {hazard.type}
-                </p>
+                  <h3>{hazard.name}</h3>
 
-                <p>
-                  <strong>Severity:</strong>{" "}
-                  {hazard.severity}
-                </p>
+                  <p>
+                    <strong>Type:</strong>{" "}
+                    {hazard.type}
+                  </p>
 
-                <p>
-                  <strong>Population:</strong>{" "}
-                  {hazard.population}
-                </p>
+                  <p>
+                    <strong>Severity:</strong>{" "}
+                    {hazard.severity}
+                  </p>
 
-                <p>
-                  <strong>Risk Score:</strong>{" "}
-                  {hazard.riskScore}
-                </p>
+                  <p>
+                    <strong>Population:</strong>{" "}
+                    {hazard.population}
+                  </p>
 
-                <p>
-                  <strong>Risk Level:</strong>{" "}
-                  {hazard.riskLevel}
-                </p>
+                  <p>
+                    <strong>Risk Score:</strong>{" "}
+                    {hazard.riskScore}
+                  </p>
 
-                <div className="button-group">
+                  <p>
+                    <strong>Risk Level:</strong>{" "}
+                    {hazard.riskLevel}
+                  </p>
 
-                  <button
-                    className="update-btn"
-                    onClick={() =>
-                      handleUpdate(hazard)
-                    }
-                  >
-                    Update
-                  </button>
+                  <div className="button-group">
 
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      handleDelete(hazard._id)
-                    }
-                  >
-                    Delete
-                  </button>
+                    <button
+                      className="update-btn"
+                      onClick={() =>
+                        handleUpdate(hazard)
+                      }
+                    >
+                      Update
+                    </button>
 
-                  <button
-                    className="relocation-btn"
-                    onClick={() =>
-                      handleRelocation(hazard)
-                    }
-                    disabled={loadingRelocation}
-                  >
-                    {loadingRelocation
-                      ? "Finding..."
-                      : "Find Safe Location"}
-                  </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() =>
+                        handleDelete(hazard._id)
+                      }
+                    >
+                      Delete
+                    </button>
+
+                    <button
+                      className="relocation-btn"
+                      onClick={() =>
+                        handleRelocation(hazard)
+                      }
+                      disabled={loadingRelocation}
+                    >
+                      {loadingRelocation
+                        ? "Finding..."
+                        : "Find Safe Location"}
+                    </button>
+
+                  </div>
 
                 </div>
 
+              ))
+
+            ) : (
+
+              <div className="info-card">
+
+                <h3>No Hazards Found</h3>
+
+                <p>
+                  Try changing the search text or
+                  risk level filter.
+                </p>
+
               </div>
 
-            ))}
+            )}
 
           </div>
 
