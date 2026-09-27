@@ -17,8 +17,7 @@ function App() {
 
   const [safeLocations, setSafeLocations] = useState([]);
 
-  const [relocationData, setRelocationData] =
-    useState(null);
+  const [relocationData, setRelocationData] = useState(null);
 
   const [loadingRelocation, setLoadingRelocation] =
     useState(false);
@@ -46,22 +45,16 @@ function App() {
       longitude: "",
     });
 
-  const [updateError, setUpdateError] =
-    useState("");
-
-  const [updateSuccess, setUpdateSuccess] =
-    useState("");
-
-  const [updatingHazard, setUpdatingHazard] =
-    useState(false);
+  const [updateError, setUpdateError] = useState("");
+  const [updateSuccess, setUpdateSuccess] = useState("");
+  const [updatingHazard, setUpdatingHazard] = useState(false);
 
   // ===============================
   // ADD HAZARD FORM
   // ===============================
 
   const [formError, setFormError] = useState("");
-  const [formSuccess, setFormSuccess] =
-    useState("");
+  const [formSuccess, setFormSuccess] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -190,7 +183,6 @@ function App() {
 
       fetchHazards();
       fetchDashboardStats();
-
     } catch (error) {
       console.error(
         "Failed to create hazard:",
@@ -218,6 +210,9 @@ function App() {
       fetchHazards();
       fetchDashboardStats();
 
+      if (selectedHazard?._id === id) {
+        setSelectedHazard(null);
+      }
     } catch (error) {
       console.error(
         "Failed to delete hazard:",
@@ -405,7 +400,6 @@ function App() {
       setTimeout(() => {
         closeUpdateModal();
       }, 800);
-
     } catch (error) {
       console.error(
         "Failed to update hazard:",
@@ -417,7 +411,6 @@ function App() {
         "Failed to update hazard";
 
       setUpdateError(message);
-
     } finally {
       setUpdatingHazard(false);
     }
@@ -441,7 +434,6 @@ function App() {
         top: 0,
         behavior: "smooth",
       });
-
     } catch (error) {
       console.error(
         "Failed to fetch relocation plan:",
@@ -449,7 +441,6 @@ function App() {
       );
 
       setRelocationData(null);
-
     } finally {
       setLoadingRelocation(false);
     }
@@ -499,6 +490,15 @@ function App() {
       return matchesSearch && matchesRisk;
     }
   );
+
+  // ===============================
+  // RESET SEARCH + FILTER
+  // ===============================
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setRiskFilter("ALL");
+  };
 
   // ===============================
   // UI
@@ -1213,6 +1213,18 @@ function App() {
 
             </select>
 
+            <button
+              type="button"
+              className="reset-filter-btn"
+              onClick={handleResetFilters}
+              disabled={
+                searchTerm === "" &&
+                riskFilter === "ALL"
+              }
+            >
+              🔄 Reset Filters
+            </button>
+
           </div>
 
           <p className="filter-result">
@@ -1315,6 +1327,14 @@ function App() {
                   Try changing the search text or
                   risk level filter.
                 </p>
+
+                <button
+                  type="button"
+                  className="reset-filter-btn"
+                  onClick={handleResetFilters}
+                >
+                  🔄 Reset Filters
+                </button>
 
               </div>
 

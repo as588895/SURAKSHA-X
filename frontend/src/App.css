@@ -1084,3 +1084,77 @@ button {
   }
 
 }
+
+/* =============================== */
+/* SEARCH FILTER RESET BUTTON */
+/* =============================== */
+
+.reset-filter-btn {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.reset-filter-btn:hover {
+  background: #e5e7eb;
+}
+
+.reset-filter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hazard-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.hazard-filters input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.hazard-filters select {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  font-size: 15px;
+}
+
+.hazard-filters input:focus,
+.hazard-filters select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.filter-result {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .hazard-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hazard-filters input,
+  .hazard-filters select,
+  .reset-filter-btn {
+    width: 100%;
+  }
+}
