@@ -17,21 +17,51 @@ function App() {
 
   const [safeLocations, setSafeLocations] = useState([]);
 
-  const [relocationData, setRelocationData] = useState(null);
+  const [relocationData, setRelocationData] =
+    useState(null);
 
   const [loadingRelocation, setLoadingRelocation] =
     useState(false);
 
-  // STEP 28
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("ALL");
 
-  // STEP 30
-  const [selectedHazard, setSelectedHazard] = useState(null);
+  const [selectedHazard, setSelectedHazard] =
+    useState(null);
 
-  // STEP 32
+  // ===============================
+  // UPDATE MODAL STATE
+  // ===============================
+
+  const [editingHazard, setEditingHazard] =
+    useState(null);
+
+  const [updateFormData, setUpdateFormData] =
+    useState({
+      name: "",
+      type: "",
+      severity: "",
+      population: "",
+      latitude: "",
+      longitude: "",
+    });
+
+  const [updateError, setUpdateError] =
+    useState("");
+
+  const [updateSuccess, setUpdateSuccess] =
+    useState("");
+
+  const [updatingHazard, setUpdatingHazard] =
+    useState(false);
+
+  // ===============================
+  // ADD HAZARD FORM
+  // ===============================
+
   const [formError, setFormError] = useState("");
-  const [formSuccess, setFormSuccess] = useState("");
+  const [formSuccess, setFormSuccess] =
+    useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -100,7 +130,7 @@ function App() {
   };
 
   // ===============================
-  // INITIAL DATA LOAD
+  // INITIAL LOAD
   // ===============================
 
   useEffect(() => {
@@ -110,7 +140,7 @@ function App() {
   }, []);
 
   // ===============================
-  // FORM CHANGE
+  // ADD FORM CHANGE
   // ===============================
 
   const handleChange = (event) => {
@@ -197,35 +227,199 @@ function App() {
   };
 
   // ===============================
-  // UPDATE HAZARD
+  // OPEN UPDATE MODAL
   // ===============================
 
-  const handleUpdate = async (hazard) => {
-    try {
-      const updatedSeverity = prompt(
-        "Enter new severity:",
-        hazard.severity
+  const handleUpdate = (hazard) => {
+    setEditingHazard(hazard);
+
+    setUpdateFormData({
+      name: hazard.name || "",
+      type: hazard.type || "",
+      severity: hazard.severity ?? "",
+      population: hazard.population ?? "",
+      latitude: hazard.latitude ?? "",
+      longitude: hazard.longitude ?? "",
+    });
+
+    setUpdateError("");
+    setUpdateSuccess("");
+  };
+
+  // ===============================
+  // UPDATE FORM CHANGE
+  // ===============================
+
+  const handleUpdateChange = (event) => {
+    setUpdateFormData({
+      ...updateFormData,
+      [event.target.name]: event.target.value,
+    });
+
+    setUpdateError("");
+    setUpdateSuccess("");
+  };
+
+  // ===============================
+  // CLOSE UPDATE MODAL
+  // ===============================
+
+  const closeUpdateModal = () => {
+    if (updatingHazard) {
+      return;
+    }
+
+    setEditingHazard(null);
+
+    setUpdateFormData({
+      name: "",
+      type: "",
+      severity: "",
+      population: "",
+      latitude: "",
+      longitude: "",
+    });
+
+    setUpdateError("");
+    setUpdateSuccess("");
+  };
+
+  // ===============================
+  // SUBMIT UPDATE
+  // ===============================
+
+  const handleUpdateSubmit = async (event) => {
+    event.preventDefault();
+
+    setUpdateError("");
+    setUpdateSuccess("");
+
+    const severity = Number(
+      updateFormData.severity
+    );
+
+    const population = Number(
+      updateFormData.population
+    );
+
+    const latitude = Number(
+      updateFormData.latitude
+    );
+
+    const longitude = Number(
+      updateFormData.longitude
+    );
+
+    // ===============================
+    // FRONTEND VALIDATION
+    // ===============================
+
+    if (!updateFormData.name.trim()) {
+      setUpdateError(
+        "Hazard name is required"
       );
+      return;
+    }
 
-      if (updatedSeverity === null) {
-        return;
-      }
+    if (!updateFormData.type.trim()) {
+      setUpdateError(
+        "Hazard type is required"
+      );
+      return;
+    }
 
-      await axios.put(
-        `http://localhost:5000/api/hazards/${hazard._id}`,
+    if (
+      updateFormData.severity === "" ||
+      !Number.isFinite(severity) ||
+      severity < 0 ||
+      severity > 100
+    ) {
+      setUpdateError(
+        "Severity must be between 0 and 100"
+      );
+      return;
+    }
+
+    if (
+      updateFormData.population === "" ||
+      !Number.isFinite(population) ||
+      population < 0
+    ) {
+      setUpdateError(
+        "Population cannot be negative"
+      );
+      return;
+    }
+
+    if (
+      !Number.isFinite(latitude) ||
+      latitude < -90 ||
+      latitude > 90
+    ) {
+      setUpdateError(
+        "Latitude must be between -90 and 90"
+      );
+      return;
+    }
+
+    if (
+      !Number.isFinite(longitude) ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      setUpdateError(
+        "Longitude must be between -180 and 180"
+      );
+      return;
+    }
+
+    try {
+      setUpdatingHazard(true);
+
+      const response = await axios.put(
+        `http://localhost:5000/api/hazards/${editingHazard._id}`,
         {
-          severity: Number(updatedSeverity),
+          name: updateFormData.name.trim(),
+          type: updateFormData.type.trim(),
+          severity,
+          population,
+          latitude,
+          longitude,
         }
       );
 
-      fetchHazards();
+      setUpdateSuccess(
+        "Hazard updated successfully!"
+      );
+
+      setHazards((previousHazards) =>
+        previousHazards.map((hazard) =>
+          hazard._id === editingHazard._id
+            ? response.data
+            : hazard
+        )
+      );
+
       fetchDashboardStats();
+
+      setTimeout(() => {
+        closeUpdateModal();
+      }, 800);
 
     } catch (error) {
       console.error(
         "Failed to update hazard:",
         error
       );
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to update hazard";
+
+      setUpdateError(message);
+
+    } finally {
+      setUpdatingHazard(false);
     }
   };
 
@@ -270,7 +464,6 @@ function App() {
   };
 
   // ===============================
-  // STEP 30
   // HAZARD DETAILS
   // ===============================
 
@@ -283,8 +476,7 @@ function App() {
   };
 
   // ===============================
-  // STEP 28
-  // HAZARD SEARCH & FILTER
+  // SEARCH + FILTER
   // ===============================
 
   const filteredHazards = hazards.filter(
@@ -316,7 +508,194 @@ function App() {
     <div className="app">
 
       {/* ================================= */}
-      {/* STEP 30 - HAZARD DETAILS MODAL */}
+      {/* UPDATE HAZARD MODAL */}
+      {/* ================================= */}
+
+      {editingHazard && (
+        <div className="modal-overlay">
+
+          <div className="update-modal">
+
+            <div className="modal-header">
+
+              <div>
+                <h2>✏️ Update Hazard</h2>
+
+                <p>
+                  Update hazard information and
+                  recalculate risk automatically.
+                </p>
+              </div>
+
+              <button
+                className="modal-close"
+                onClick={closeUpdateModal}
+              >
+                ✕
+              </button>
+
+            </div>
+
+            {updateError && (
+              <div className="form-error">
+                ⚠️ {updateError}
+              </div>
+            )}
+
+            {updateSuccess && (
+              <div className="form-success">
+                ✅ {updateSuccess}
+              </div>
+            )}
+
+            <form
+              className="update-form"
+              onSubmit={handleUpdateSubmit}
+            >
+
+              <div className="form-field">
+
+                <label>
+                  Hazard Name
+                </label>
+
+                <input
+                  type="text"
+                  name="name"
+                  value={updateFormData.name}
+                  onChange={handleUpdateChange}
+                  placeholder="Enter hazard name"
+                  required
+                />
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Hazard Type
+                </label>
+
+                <input
+                  type="text"
+                  name="type"
+                  value={updateFormData.type}
+                  onChange={handleUpdateChange}
+                  placeholder="Enter hazard type"
+                  required
+                />
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Severity
+                </label>
+
+                <input
+                  type="number"
+                  name="severity"
+                  value={updateFormData.severity}
+                  onChange={handleUpdateChange}
+                  min="0"
+                  max="100"
+                  placeholder="0 - 100"
+                  required
+                />
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Affected Population
+                </label>
+
+                <input
+                  type="number"
+                  name="population"
+                  value={updateFormData.population}
+                  onChange={handleUpdateChange}
+                  min="0"
+                  placeholder="Enter population"
+                  required
+                />
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Latitude
+                </label>
+
+                <input
+                  type="number"
+                  step="any"
+                  name="latitude"
+                  value={updateFormData.latitude}
+                  onChange={handleUpdateChange}
+                  min="-90"
+                  max="90"
+                  placeholder="Latitude"
+                  required
+                />
+
+              </div>
+
+              <div className="form-field">
+
+                <label>
+                  Longitude
+                </label>
+
+                <input
+                  type="number"
+                  step="any"
+                  name="longitude"
+                  value={updateFormData.longitude}
+                  onChange={handleUpdateChange}
+                  min="-180"
+                  max="180"
+                  placeholder="Longitude"
+                  required
+                />
+
+              </div>
+
+              <div className="update-modal-actions">
+
+                <button
+                  type="button"
+                  className="close-btn"
+                  onClick={closeUpdateModal}
+                  disabled={updatingHazard}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="primary-btn"
+                  disabled={updatingHazard}
+                >
+                  {updatingHazard
+                    ? "Updating..."
+                    : "Update Hazard"}
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ================================= */}
+      {/* HAZARD DETAILS MODAL */}
       {/* ================================= */}
 
       {selectedHazard && (
@@ -347,7 +726,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Hazard Name</span>
-
                 <strong>
                   {selectedHazard.name}
                 </strong>
@@ -355,7 +733,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Hazard Type</span>
-
                 <strong>
                   {selectedHazard.type}
                 </strong>
@@ -363,7 +740,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Severity</span>
-
                 <strong>
                   {selectedHazard.severity}/100
                 </strong>
@@ -371,7 +747,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Affected Population</span>
-
                 <strong>
                   {selectedHazard.population}
                 </strong>
@@ -379,7 +754,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Risk Score</span>
-
                 <strong>
                   {selectedHazard.riskScore}
                 </strong>
@@ -387,17 +761,13 @@ function App() {
 
               <div className="detail-item">
                 <span>Risk Level</span>
-
-                <strong
-                  className={`risk-text risk-${selectedHazard.riskLevel?.toLowerCase()}`}
-                >
+                <strong>
                   {selectedHazard.riskLevel}
                 </strong>
               </div>
 
               <div className="detail-item">
                 <span>Latitude</span>
-
                 <strong>
                   {selectedHazard.latitude ?? "N/A"}
                 </strong>
@@ -405,7 +775,6 @@ function App() {
 
               <div className="detail-item">
                 <span>Longitude</span>
-
                 <strong>
                   {selectedHazard.longitude ?? "N/A"}
                 </strong>
@@ -449,14 +818,12 @@ function App() {
           <div className="section-title">
 
             <div>
-
               <h2>🚨 Relocation Plan</h2>
 
               <p className="section-subtitle">
                 Smart relocation recommendation based
                 on distance and available capacity.
               </p>
-
             </div>
 
             <button
@@ -569,7 +936,6 @@ function App() {
                   </div>
 
                 </div>
-
               )
             )}
 
@@ -599,7 +965,9 @@ function App() {
         </section>
       )}
 
+      {/* ================================= */}
       {/* HEADER */}
+      {/* ================================= */}
 
       <header className="header">
 
@@ -613,25 +981,23 @@ function App() {
 
       <main className="container">
 
+        {/* ================================= */}
         {/* ADD HAZARD */}
+        {/* ================================= */}
 
         <section className="section">
 
           <div className="section-title">
 
             <div>
-
               <h2>➕ Add New Hazard</h2>
 
               <p className="section-subtitle">
                 Enter hazard details to add a new risk zone
               </p>
-
             </div>
 
           </div>
-
-          {/* STEP 32 - VALIDATION MESSAGES */}
 
           {formError && (
             <div className="form-error">
@@ -724,7 +1090,9 @@ function App() {
 
         </section>
 
-        {/* DASHBOARD OVERVIEW */}
+        {/* ================================= */}
+        {/* DASHBOARD */}
+        {/* ================================= */}
 
         <section className="section">
 
@@ -778,7 +1146,9 @@ function App() {
 
         </section>
 
+        {/* ================================= */}
         {/* MAP */}
+        {/* ================================= */}
 
         <section className="section">
 
@@ -795,13 +1165,13 @@ function App() {
 
         </section>
 
+        {/* ================================= */}
         {/* HAZARDS */}
+        {/* ================================= */}
 
         <section className="section">
 
           <h2>Hazards</h2>
-
-          {/* SEARCH + FILTER */}
 
           <div className="hazard-filters">
 
@@ -857,7 +1227,7 @@ function App() {
               filteredHazards.map((hazard) => (
 
                 <div
-                  className={`hazard-card risk-${hazard.riskLevel?.toLowerCase()}`}
+                  className="hazard-card"
                   key={hazard._id}
                 >
 
@@ -954,7 +1324,9 @@ function App() {
 
         </section>
 
+        {/* ================================= */}
         {/* SAFE LOCATIONS */}
+        {/* ================================= */}
 
         <section className="section">
 
