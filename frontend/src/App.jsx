@@ -20,6 +20,8 @@ import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import RiskIntelligence from "./components/RiskIntelligence";
 import LiveMonitoring from "./components/LiveMonitoring";
 import ReportCenter from "./components/ReportCenter";
+import AIRiskPrediction from "./components/AIRiskPrediction";
+import DynamicHazardRadius from "./components/DynamicHazardRadius";
 
 const API = "http://localhost:5000/api";
 
@@ -254,6 +256,10 @@ function App() {
         <AnalyticsDashboard hazards={hazards} />
 
         <RiskIntelligence hazards={hazards} onRelocation={openRelocation} />
+
+        <AIRiskPrediction hazards={hazards} onSelect={setSelectedHazard} />
+
+        <DynamicHazardRadius hazards={hazards} />
 
         <HazardForm
           onSubmit={addHazard}

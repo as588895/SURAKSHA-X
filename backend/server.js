@@ -6,6 +6,7 @@ const hazardRoutes = require("./routes/hazardRoutes");
 const safeLocationRoutes = require("./routes/safeLocationRoutes");
 const relocationRoutes = require("./routes/relocationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const intelligenceRoutes = require("./routes/intelligenceRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use("/api/hazards", hazardRoutes);
 app.use("/api/safe-locations", safeLocationRoutes);
 app.use("/api/relocation", relocationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/intelligence", intelligenceRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)
