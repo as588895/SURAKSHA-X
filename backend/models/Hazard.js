@@ -5,11 +5,13 @@ const hazardSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
 
     type: {
       type: String,
       required: true,
+      trim: true,
     },
 
     severity: {
@@ -22,31 +24,67 @@ const hazardSchema = new mongoose.Schema(
     population: {
       type: Number,
       required: true,
+      min: 0,
     },
 
-    riskLevel: {
-      type: String,
-      required: true,
-    },
-
-    riskScore: {
-      type: Number,
-      required: true,
-    },
-    
     latitude: {
       type: Number,
       required: true,
+      min: -90,
+      max: 90,
     },
 
     longitude: {
       type: Number,
       required: true,
+      min: -180,
+      max: 180,
+    },
+
+    riskScore: {
+      type: Number,
+      default: 0,
+    },
+
+    riskLevel: {
+      type: String,
+      enum: [
+        "LOW",
+        "MODERATE",
+        "HIGH",
+        "CRITICAL",
+      ],
+      default: "LOW",
+    },
+
+    // ==================================
+    // EMERGENCY PRIORITY
+    // ==================================
+
+    priorityScore: {
+      type: Number,
+      default: 0,
+    },
+
+    priorityLevel: {
+      type: String,
+      enum: [
+        "LOW",
+        "MODERATE",
+        "HIGH",
+        "CRITICAL",
+      ],
+      default: "LOW",
     },
   },
+
   {
     timestamps: true,
-  },
+  }
 );
 
-module.exports = mongoose.model("Hazard", hazardSchema);
+module.exports =
+  mongoose.model(
+    "Hazard",
+    hazardSchema
+  );
