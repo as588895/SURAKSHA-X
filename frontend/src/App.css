@@ -2188,15 +2188,28 @@ button:disabled {
 .confirm-relocation-btn {
   margin-top: 18px;
   width: 100%;
-  padding: 12px 16px;
-  border: none;
+  padding: 13px 16px;
+  border: 1px solid rgba(39, 209, 127, 0.35);
   border-radius: 10px;
-  background: #16a34a;
-  color: white;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.15);
+}
+
+.confirm-relocation-btn:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.22);
+}
+
+.confirm-relocation-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .confirm-relocation-btn:hover {
@@ -2211,12 +2224,13 @@ button:disabled {
 
 .relocation-confirmed {
   margin-top: 18px;
-  padding: 12px;
+  padding: 14px 16px;
   border-radius: 10px;
-  background: rgba(22, 163, 74, 0.12);
-  border: 1px solid rgba(22, 163, 74, 0.35);
-  color: #15803d;
+  background: rgba(39, 209, 127, 0.10);
+  border: 1px solid rgba(39, 209, 127, 0.35);
+  color: #86efac;
   font-weight: 700;
+  line-height: 1.5;
 }
 
 .relocation-confirmed span {
@@ -2224,4 +2238,368 @@ button:disabled {
   margin-top: 5px;
   font-size: 13px;
   font-weight: 500;
+  color: #b7f7d0;
+}
+
+.relocation-confirmed span {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   FINAL TEXT VISIBILITY FIX
+   SURAKSHA-X DARK COMMAND CENTER THEME
+   ========================================================= */
+
+:root {
+  --heading-text: #f4f9ff;
+  --body-text: #d5e3f0;
+  --muted-text: #9db2c7;
+  --accent-blue: #5ed0ff;
+  --accent-cyan: #55e6c2;
+}
+
+/* ================= GLOBAL TEXT ================= */
+
+body {
+  color: var(--body-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading-text) !important;
+}
+
+p {
+  color: var(--body-text);
+}
+
+/* ================= TOP BRAND ================= */
+
+.brand-area h1 {
+  color: #f4f9ff !important;
+  text-shadow: 0 0 18px rgba(53, 184, 255, 0.12);
+}
+
+.brand-area span {
+  color: #9db2c7 !important;
+}
+
+/* ================= HERO ================= */
+
+.hero-content h2 {
+  color: #f4f9ff !important;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.hero-content h2 span {
+  background: linear-gradient(
+    90deg,
+    #5ed0ff 0%,
+    #55e6c2 100%
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+}
+
+.hero-content p {
+  color: #a9bdd0 !important;
+}
+
+/* ================= SECTION HEADINGS ================= */
+
+.section-heading h2 {
+  color: #f4f9ff !important;
+}
+
+.section-heading p {
+  color: #9db2c7 !important;
+}
+
+.section-kicker {
+  color: #5ed0ff !important;
+}
+
+/* ================= RISK INTELLIGENCE ================= */
+
+.ai-risk-section h2,
+.ai-risk-section h3,
+.ai-risk-section .panel-title h3 {
+  color: #f4f9ff !important;
+}
+
+.ai-risk-section p {
+  color: #a9bdd0 !important;
+}
+
+.ai-top-card h2 {
+  color: #f4f9ff !important;
+}
+
+.ai-top-card p {
+  color: #a9bdd0 !important;
+}
+
+/* ================= PRIORITY CENTER ================= */
+
+.top-priority-main h2,
+.top-priority-main h3 {
+  color: #f4f9ff !important;
+}
+
+.priority-info strong {
+  color: #f4f9ff !important;
+}
+
+.priority-info span {
+  color: #9db2c7 !important;
+}
+
+/* ================= ANALYTICS ================= */
+
+.analytics-card strong,
+.analytics-panel h3,
+.panel-title h3 {
+  color: #f4f9ff !important;
+}
+
+.analytics-card span,
+.analytics-card small,
+.panel-title span {
+  color: #9db2c7 !important;
+}
+
+/* ================= HAZARD CARDS ================= */
+
+.hazard-card h3,
+.safe-card h3 {
+  color: #f4f9ff !important;
+}
+
+.hazard-type,
+.safe-type {
+  color: #69d3ff !important;
+}
+
+.hazard-location,
+.safe-location {
+  color: #9db2c7 !important;
+}
+
+.hazard-metrics strong,
+.safe-capacity strong {
+  color: #edf6ff !important;
+}
+
+.hazard-metrics span,
+.safe-capacity span {
+  color: #8fa7bc !important;
+}
+
+/* ================= AI LIST ================= */
+
+.ai-row {
+  color: #f4f9ff !important;
+}
+
+.ai-row-main strong {
+  color: #f4f9ff !important;
+}
+
+.ai-row-main small {
+  color: #9db2c7 !important;
+}
+
+.ai-row-score {
+  color: #eaf7ff !important;
+}
+
+/* ================= INTELLIGENCE LIST ================= */
+
+.intel-main strong {
+  color: #f4f9ff !important;
+}
+
+.intel-main span {
+  color: #9db2c7 !important;
+}
+
+.intel-score strong {
+  color: #f4f9ff !important;
+}
+
+/* ================= RADIUS SECTION ================= */
+
+.radius-section h2,
+.radius-section h3 {
+  color: #f4f9ff !important;
+}
+
+.radius-readout strong {
+  color: #f4f9ff !important;
+}
+
+.radius-readout span {
+  color: #9db2c7 !important;
+}
+
+.radius-metrics strong {
+  color: #f4f9ff !important;
+}
+
+.radius-metrics span {
+  color: #9db2c7 !important;
+}
+
+/* ================= FORMS ================= */
+
+.input-group label,
+.form-field label {
+  color: #c5d5e4 !important;
+}
+
+.input-group input,
+.form-field input,
+.hazard-filters input,
+.hazard-filters select {
+  color: #f4f9ff !important;
+}
+
+.input-group input::placeholder,
+.form-field input::placeholder,
+.hazard-filters input::placeholder {
+  color: #71879b !important;
+}
+
+/* ================= MODALS ================= */
+
+.modal-header h2 {
+  color: #f4f9ff !important;
+}
+
+.modal-header p {
+  color: #9db2c7 !important;
+}
+
+.detail-item strong {
+  color: #f4f9ff !important;
+}
+
+.detail-item span {
+  color: #8fa7bc !important;
+}
+
+.hazard-summary h3 {
+  color: #f4f9ff !important;
+}
+
+.hazard-summary p {
+  color: #9db2c7 !important;
+}
+
+.location-info h3 {
+  color: #f4f9ff !important;
+}
+
+.location-info p {
+  color: #9db2c7 !important;
+}
+
+/* ================= RELOCATION ================= */
+
+.plan-heading h3 {
+  color: #f4f9ff !important;
+}
+
+.recommendation h3 {
+  color: #f4f9ff !important;
+}
+
+.recommendation p {
+  color: #b1c3d2 !important;
+}
+
+/* ================= LIVE MONITORING ================= */
+
+.monitoring-left strong {
+  color: #f4f9ff !important;
+}
+
+.monitoring-left small,
+.monitoring-metrics {
+  color: #9db2c7 !important;
+}
+
+/* ================= REPORT ================= */
+
+.report-content h2 {
+  color: #f4f9ff !important;
+}
+
+.report-content p {
+  color: #9db2c7 !important;
+}
+
+/* ================= FOOTER ================= */
+
+.system-footer {
+  color: #9db2c7 !important;
+}
+
+.system-footer strong {
+  color: #f4f9ff !important;
+}
+
+.system-footer span {
+  color: #8fa7bc !important;
+}
+
+/* ================= EMPTY / LOADING ================= */
+
+.loading-state,
+.empty-state {
+  color: #9db2c7 !important;
+}
+
+.empty-state h3 {
+  color: #f4f9ff !important;
+}
+
+/* ================= BUTTON TEXT ================= */
+
+.hero-primary-btn,
+.hero-secondary-btn,
+.primary-btn,
+.update-btn,
+.details-btn,
+.relocation-btn,
+.delete-btn,
+.mini-action,
+.refresh-btn {
+  color: #f4f9ff !important;
+}
+
+/* ================= MOBILE TEXT ================= */
+
+@media (max-width: 760px) {
+  .brand-area h1 {
+    color: #f4f9ff !important;
+  }
+
+  .hero-content h2 {
+    color: #f4f9ff !important;
+  }
+
+  .section-heading h2 {
+    color: #f4f9ff !important;
+  }
 }

@@ -1,5 +1,7 @@
 const riskClass = (level) =>
-  `risk-${String(level || "unknown").toLowerCase()}`;
+  `risk-${String(
+    level || "unknown"
+  ).toLowerCase()}`;
 
 const riskIcon = (level) =>
   ({
@@ -10,14 +12,26 @@ const riskIcon = (level) =>
   }[level] || "⚪");
 
 const hazardIcon = (type) => {
-  const value = type?.toLowerCase() || "";
+  const value =
+    type?.toLowerCase() || "";
 
-  if (value.includes("landslide")) return "⛰️";
-  if (value.includes("flood")) return "🌊";
-  if (value.includes("earthquake")) return "🌋";
-  if (value.includes("fire")) return "🔥";
-  if (value.includes("cyclone")) return "🌀";
-  if (value.includes("storm")) return "⛈️";
+  if (value.includes("landslide"))
+    return "⛰️";
+
+  if (value.includes("flood"))
+    return "🌊";
+
+  if (value.includes("earthquake"))
+    return "🌋";
+
+  if (value.includes("fire"))
+    return "🔥";
+
+  if (value.includes("cyclone"))
+    return "🌀";
+
+  if (value.includes("storm"))
+    return "⛈️";
 
   return "⚠️";
 };
@@ -31,24 +45,29 @@ function PriorityCenter({
   predictions = [],
   onRelocation,
 }) {
-  const getPrediction = (hazardId) => {
+  const getPrediction = (
+    hazardId
+  ) => {
     return predictions.find(
-      (item) => item._id === hazardId
+      (item) =>
+        item._id === hazardId
     )?.prediction;
   };
 
-  const highestPrediction = highestPriorityHazard
-    ? getPrediction(highestPriorityHazard._id)
-    : null;
+  const highestPrediction =
+    highestPriorityHazard
+      ? getPrediction(
+          highestPriorityHazard._id
+        )
+      : null;
 
   return (
     <section className="section emergency-section">
 
-      {/* ================= SECTION HEADER ================= */}
-
       <div className="section-heading">
 
         <div>
+
           <span className="section-kicker">
             RESPONSE INTELLIGENCE
           </span>
@@ -58,9 +77,12 @@ function PriorityCenter({
           </h2>
 
           <p>
-            Automated prioritization combined with
-            backend risk intelligence for emergency response.
+            Automated prioritization
+            combined with backend risk
+            intelligence for emergency
+            response.
           </p>
+
         </div>
 
         <div className="heading-icon emergency-icon">
@@ -69,30 +91,57 @@ function PriorityCenter({
 
       </div>
 
-      {/* ================= SUMMARY ================= */}
+      {/* =================================================
+          SUMMARY
+      ================================================= */}
 
       <div className="priority-summary">
 
         <div className="priority-stat priority-critical-stat">
-          <span>Critical Priority</span>
-          <strong>{criticalPriorityCount}</strong>
+
+          <span>
+            Critical Priority
+          </span>
+
+          <strong>
+            {criticalPriorityCount}
+          </strong>
+
         </div>
 
         <div className="priority-stat priority-high-stat">
-          <span>High Priority</span>
-          <strong>{highPriorityCount}</strong>
+
+          <span>
+            High Priority
+          </span>
+
+          <strong>
+            {highPriorityCount}
+          </strong>
+
         </div>
 
         <div className="priority-stat priority-population-stat">
-          <span>Emergency Population</span>
+
+          <span>
+            Emergency Population
+          </span>
+
           <strong>
-            {Number(emergencyPopulation).toLocaleString("en-IN")}
+            {Number(
+              emergencyPopulation
+            ).toLocaleString(
+              "en-IN"
+            )}
           </strong>
+
         </div>
 
       </div>
 
-      {/* ================= TOP PRIORITY ================= */}
+      {/* =================================================
+          TOP PRIORITY
+      ================================================= */}
 
       {highestPriorityHazard ? (
 
@@ -105,8 +154,17 @@ function PriorityCenter({
             </span>
 
             <h2>
-              {hazardIcon(highestPriorityHazard.type)}{" "}
-              {highestPriorityHazard.name}
+
+              {
+                hazardIcon(
+                  highestPriorityHazard.type
+                )
+              }{" "}
+
+              {
+                highestPriorityHazard.name
+              }
+
             </h2>
 
             <div className="priority-meta">
@@ -114,7 +172,9 @@ function PriorityCenter({
               <span>
                 Type:{" "}
                 <strong>
-                  {highestPriorityHazard.type}
+                  {
+                    highestPriorityHazard.type
+                  }
                 </strong>
               </span>
 
@@ -122,23 +182,27 @@ function PriorityCenter({
                 Population:{" "}
                 <strong>
                   {Number(
-                    highestPriorityHazard.population || 0
-                  ).toLocaleString("en-IN")}
+                    highestPriorityHazard.population ||
+                      0
+                  ).toLocaleString(
+                    "en-IN"
+                  )}
                 </strong>
               </span>
 
               <span>
                 Severity:{" "}
                 <strong>
-                  {highestPriorityHazard.severity}/100
+                  {
+                    highestPriorityHazard.severity
+                  }
+                  /100
                 </strong>
               </span>
 
             </div>
 
           </div>
-
-          {/* ================= SCORE AREA ================= */}
 
           <div className="priority-score-box">
 
@@ -147,7 +211,9 @@ function PriorityCenter({
             </span>
 
             <strong>
-              {highestPriorityHazard.priorityScore}
+              {
+                highestPriorityHazard.priorityScore
+              }
             </strong>
 
             <span
@@ -155,15 +221,20 @@ function PriorityCenter({
                 highestPriorityHazard.priorityLevel
               )}`}
             >
-              {riskIcon(
+
+              {
+                riskIcon(
+                  highestPriorityHazard.priorityLevel
+                )
+              }{" "}
+
+              {
                 highestPriorityHazard.priorityLevel
-              )}{" "}
-              {highestPriorityHazard.priorityLevel}
+              }
+
             </span>
 
           </div>
-
-          {/* ================= AI SCORE ================= */}
 
           {highestPrediction && (
 
@@ -174,8 +245,15 @@ function PriorityCenter({
               </span>
 
               <strong>
-                {highestPrediction.predictedScore}
-                <small>/100</small>
+
+                {
+                  highestPrediction.predictedScore
+                }
+
+                <small>
+                  /100
+                </small>
+
               </strong>
 
               <span
@@ -183,10 +261,17 @@ function PriorityCenter({
                   highestPrediction.predictedRisk
                 )}`}
               >
-                {riskIcon(
+
+                {
+                  riskIcon(
+                    highestPrediction.predictedRisk
+                  )
+                }{" "}
+
+                {
                   highestPrediction.predictedRisk
-                )}{" "}
-                {highestPrediction.predictedRisk}
+                }
+
               </span>
 
             </div>
@@ -199,14 +284,17 @@ function PriorityCenter({
 
         <div className="empty-state">
 
-          <div>🛰️</div>
+          <div>
+            🛰️
+          </div>
 
           <h3>
             No Emergency Data
           </h3>
 
           <p>
-            Add a hazard to generate emergency priority
+            Add a hazard to generate
+            emergency priority
             information.
           </p>
 
@@ -214,7 +302,9 @@ function PriorityCenter({
 
       )}
 
-      {/* ================= PRIORITY QUEUE ================= */}
+      {/* =================================================
+          PRIORITY QUEUE
+      ================================================= */}
 
       {hazards.length > 0 && (
 
@@ -229,7 +319,8 @@ function PriorityCenter({
               </h3>
 
               <p>
-                Highest-risk incidents requiring attention
+                Highest-risk incidents
+                requiring attention
               </p>
 
             </div>
@@ -240,97 +331,134 @@ function PriorityCenter({
 
           </div>
 
-          {hazards.slice(0, 5).map((hazard, index) => {
+          {hazards
+            .slice(0, 5)
+            .map(
+              (
+                hazard,
+                index
+              ) => {
 
-            const prediction = getPrediction(
-              hazard._id
-            );
+                const prediction =
+                  getPrediction(
+                    hazard._id
+                  );
 
-            return (
+                return (
 
-              <div
-                className="priority-row"
-                key={hazard._id}
-              >
-
-                <div className="priority-rank">
-                  #{index + 1}
-                </div>
-
-                <div className="priority-info">
-
-                  <strong>
-                    {hazardIcon(hazard.type)}{" "}
-                    {hazard.name}
-                  </strong>
-
-                  <span>
-                    {hazard.type} •{" "}
-                    {Number(
-                      hazard.population || 0
-                    ).toLocaleString("en-IN")}{" "}
-                    people affected
-                  </span>
-
-                </div>
-
-                {/* EXISTING PRIORITY */}
-
-                <div className="priority-score">
-
-                  <strong>
-                    {hazard.priorityScore}
-                  </strong>
-
-                  <span
-                    className={`priority-badge ${riskClass(
-                      hazard.priorityLevel
-                    )}`}
+                  <div
+                    className="priority-row"
+                    key={
+                      hazard._id
+                    }
                   >
-                    {hazard.priorityLevel}
-                  </span>
 
-                </div>
+                    <div className="priority-rank">
+                      #{index + 1}
+                    </div>
 
-                {/* AI PREDICTION */}
+                    <div className="priority-info">
 
-                {prediction && (
+                      <strong>
 
-                  <div className="ai-mini-score">
+                        {
+                          hazardIcon(
+                            hazard.type
+                          )
+                        }{" "}
 
-                    <small>
-                      AI
-                    </small>
+                        {
+                          hazard.name
+                        }
 
-                    <strong>
-                      {prediction.predictedScore}
-                    </strong>
+                      </strong>
 
-                    <span
-                      className={`priority-badge ${riskClass(
-                        prediction.predictedRisk
-                      )}`}
+                      <span>
+
+                        {hazard.type} •{" "}
+
+                        {Number(
+                          hazard.population ||
+                            0
+                        ).toLocaleString(
+                          "en-IN"
+                        )}{" "}
+
+                        people affected
+
+                      </span>
+
+                    </div>
+
+                    <div className="priority-score">
+
+                      <strong>
+                        {
+                          hazard.priorityScore
+                        }
+                      </strong>
+
+                      <span
+                        className={`priority-badge ${riskClass(
+                          hazard.priorityLevel
+                        )}`}
+                      >
+
+                        {
+                          hazard.priorityLevel
+                        }
+
+                      </span>
+
+                    </div>
+
+                    {prediction && (
+
+                      <div className="ai-mini-score">
+
+                        <small>
+                          AI
+                        </small>
+
+                        <strong>
+                          {
+                            prediction.predictedScore
+                          }
+                        </strong>
+
+                        <span
+                          className={`priority-badge ${riskClass(
+                            prediction.predictedRisk
+                          )}`}
+                        >
+
+                          {
+                            prediction.predictedRisk
+                          }
+
+                        </span>
+
+                      </div>
+
+                    )}
+
+                    <button
+                      type="button"
+                      className="mini-action"
+                      onClick={() =>
+                        onRelocation(
+                          hazard
+                        )
+                      }
                     >
-                      {prediction.predictedRisk}
-                    </span>
+                      Plan
+                    </button>
 
                   </div>
 
-                )}
-
-                <button
-                  className="mini-action"
-                  onClick={() =>
-                    onRelocation(hazard)
-                  }
-                >
-                  Plan
-                </button>
-
-              </div>
-
-            );
-          })}
+                );
+              }
+            )}
 
         </div>
 

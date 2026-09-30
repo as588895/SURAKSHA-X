@@ -3,56 +3,104 @@ import axios from "axios";
 
 const API = "http://localhost:5000/api";
 
-function RelocationModal({ data, onClose }) {
-  const [confirming, setConfirming] = useState(false);
-  const [confirmedLocations, setConfirmedLocations] = useState({});
+function RelocationModal({
+  data,
+  onClose,
+  onConfirmed,
+}) {
+  const [confirmingLocationId, setConfirmingLocationId] =
+    useState(null);
+
+  const [confirmedLocations, setConfirmedLocations] =
+    useState({});
+
   const [error, setError] = useState("");
 
   if (!data) return null;
 
-  const summary = data.relocationSummary || {};
+  const summary =
+    data.relocationSummary || {};
 
-  const isComplete = summary.status === "COMPLETE";
+  const isComplete =
+    summary.status === "COMPLETE";
 
-  // ==========================================
+  // =========================================================
   // CONFIRM RELOCATION
-  // ==========================================
+  // =========================================================
 
-  const handleConfirmRelocation = async (location) => {
-    try {
-      setConfirming(true);
-      setError("");
+  const handleConfirmRelocation =
+    async (location) => {
+      if (!location?.locationId) {
+        return;
+      }
 
-      const response = await axios.post(
-        `${API}/relocation/confirm`,
-        {
-          hazardId: data.hazard?.id,
-          locationId: location.locationId,
-          people: location.peopleToRelocate,
+      try {
+        setConfirmingLocationId(
+          location.locationId
+        );
+
+        setError("");
+
+        const response =
+          await axios.post(
+            `${API}/relocation/confirm`,
+            {
+              hazardId:
+                data.hazard?.id,
+
+              locationId:
+                location.locationId,
+
+              people:
+                Number(
+                  location.peopleToRelocate
+                ),
+            }
+          );
+
+        const relocation =
+          response.data.relocation;
+
+        setConfirmedLocations(
+          (prev) => ({
+            ...prev,
+
+            [location.locationId]:
+              relocation,
+          })
+        );
+
+        // Refresh parent dashboard
+        if (onConfirmed) {
+          await onConfirmed();
         }
-      );
 
-      const relocation =
-        response.data.relocation;
+      } catch (error) {
+        console.error(
+          "Relocation confirmation failed:",
+          error
+        );
 
-      setConfirmedLocations((prev) => ({
-        ...prev,
-        [location.locationId]: relocation,
-      }));
+        setError(
+          error.response?.data
+            ?.message ||
+            "Failed to confirm relocation."
+        );
+      } finally {
+        setConfirmingLocationId(null);
+      }
+    };
 
-    } catch (error) {
-      console.error(
-        "Relocation confirmation failed:",
-        error
-      );
+  // =========================================================
+  // CLOSE
+  // =========================================================
 
-      setError(
-        error.response?.data?.message ||
-          "Failed to confirm relocation."
-      );
-    } finally {
-      setConfirming(false);
-    }
+  const handleClose = () => {
+    setError("");
+    setConfirmingLocationId(null);
+    setConfirmedLocations({});
+
+    onClose();
   };
 
   return (
@@ -60,9 +108,9 @@ function RelocationModal({ data, onClose }) {
 
       <div className="relocation-modal">
 
-        {/* ==========================================
+        {/* =================================================
             HEADER
-        ========================================== */}
+        ================================================= */}
 
         <div className="modal-header">
 
@@ -77,25 +125,27 @@ function RelocationModal({ data, onClose }) {
             </h2>
 
             <p>
-              Recommended safe-location allocation
-              based on distance, population and
-              available capacity.
+              Recommended safe-location
+              allocation based on distance,
+              population and available
+              capacity.
             </p>
 
           </div>
 
           <button
+            type="button"
             className="modal-close"
-            onClick={onClose}
+            onClick={handleClose}
           >
             ✕
           </button>
 
         </div>
 
-        {/* ==========================================
+        {/* =================================================
             HAZARD SUMMARY
-        ========================================== */}
+        ================================================= */}
 
         <div className="hazard-summary">
 
@@ -104,39 +154,51 @@ function RelocationModal({ data, onClose }) {
           </h3>
 
           <p>
-            <strong>Name:</strong>{" "}
+            <strong>
+              Name:
+            </strong>{" "}
             {data.hazard?.name ||
               "Unknown"}
           </p>
 
           <p>
-            <strong>Type:</strong>{" "}
+            <strong>
+              Type:
+            </strong>{" "}
             {data.hazard?.type ||
               "Unknown"}
           </p>
 
           <p>
-            <strong>Severity:</strong>{" "}
-            {data.hazard?.severity ?? 0}/100
+            <strong>
+              Severity:
+            </strong>{" "}
+            {data.hazard?.severity ??
+              0}
+            /100
           </p>
 
           <p>
-            <strong>Risk Level:</strong>{" "}
+            <strong>
+              Risk Level:
+            </strong>{" "}
             {data.hazard?.riskLevel ||
               "LOW"}
           </p>
 
           <p>
-            <strong>Priority Score:</strong>{" "}
+            <strong>
+              Priority Score:
+            </strong>{" "}
             {data.hazard?.priorityScore ??
               0}
           </p>
 
         </div>
 
-        {/* ==========================================
+        {/* =================================================
             SUMMARY
-        ========================================== */}
+        ================================================= */}
 
         <div className="summary-grid">
 
@@ -191,7 +253,8 @@ function RelocationModal({ data, onClose }) {
 
             <strong>
               {summary.relocationCoverage ??
-                0}%
+                0}
+              %
             </strong>
           </div>
 
@@ -209,9 +272,9 @@ function RelocationModal({ data, onClose }) {
 
         </div>
 
-        {/* ==========================================
+        {/* =================================================
             PLAN
-        ========================================== */}
+        ================================================= */}
 
         <h3 className="plan-heading">
           🏠 Safe Location Allocation
@@ -228,6 +291,10 @@ function RelocationModal({ data, onClose }) {
                   confirmedLocations[
                     location.locationId
                   ];
+
+                const isConfirming =
+                  confirmingLocationId ===
+                  location.locationId;
 
                 return (
                   <div
@@ -261,7 +328,8 @@ function RelocationModal({ data, onClose }) {
                           Distance:
                         </strong>{" "}
                         {location.distance ??
-                          0} km
+                          0}{" "}
+                        km
                       </p>
 
                       <p>
@@ -276,10 +344,8 @@ function RelocationModal({ data, onClose }) {
                         <strong>
                           Available Capacity:
                         </strong>{" "}
-                        {confirmed
-                          ? confirmed.remainingCapacity
-                          : location.availableCapacity ??
-                            0}
+                        {location.availableCapacity ??
+                          0}
                       </p>
 
                       <p className="assigned">
@@ -297,20 +363,18 @@ function RelocationModal({ data, onClose }) {
                         <strong>
                           Remaining Capacity:
                         </strong>{" "}
-
-                        {confirmed
-                          ? confirmed.remainingCapacity
-                          : location.remainingCapacity ??
-                            0}
+                        {location.remainingCapacity ??
+                          0}
                       </p>
 
-                      {/* ==================================
+                      {/* =================================================
                           CONFIRM BUTTON
-                      ================================== */}
+                      ================================================= */}
 
                       {!confirmed ? (
 
                         <button
+                          type="button"
                           className="confirm-relocation-btn"
                           onClick={() =>
                             handleConfirmRelocation(
@@ -318,12 +382,14 @@ function RelocationModal({ data, onClose }) {
                             )
                           }
                           disabled={
-                            confirming
+                            isConfirming
                           }
                         >
-                          {confirming
+
+                          {isConfirming
                             ? "⏳ Confirming..."
                             : "✅ Confirm Relocation"}
+
                         </button>
 
                       ) : (
@@ -333,7 +399,9 @@ function RelocationModal({ data, onClose }) {
                           ✅ Relocation Confirmed
 
                           <span>
-                            {confirmed.peopleRelocated}{" "}
+                            {
+                              confirmed.peopleRelocated
+                            }{" "}
                             people relocated
                           </span>
 
@@ -361,8 +429,9 @@ function RelocationModal({ data, onClose }) {
               </h3>
 
               <p>
-                No safe-location allocation
-                is currently available.
+                No safe-location
+                allocation is currently
+                available.
               </p>
 
             </div>
@@ -370,9 +439,9 @@ function RelocationModal({ data, onClose }) {
 
         </div>
 
-        {/* ==========================================
+        {/* =================================================
             ERROR
-        ========================================== */}
+        ================================================= */}
 
         {error && (
 
@@ -390,9 +459,9 @@ function RelocationModal({ data, onClose }) {
 
         )}
 
-        {/* ==========================================
+        {/* =================================================
             RECOMMENDATION
-        ========================================== */}
+        ================================================= */}
 
         <div
           className={`recommendation ${
@@ -411,17 +480,15 @@ function RelocationModal({ data, onClose }) {
           </h3>
 
           <p>
-
             {data.recommendation ||
               "No recommendation available."}
-
           </p>
 
         </div>
 
-        {/* ==========================================
+        {/* =================================================
             ADDITIONAL CAPACITY
-        ========================================== */}
+        ================================================= */}
 
         {!isComplete &&
           (summary.additionalCapacityRequired ??
@@ -438,7 +505,9 @@ function RelocationModal({ data, onClose }) {
                 Additional capacity required:{" "}
 
                 <strong>
-                  {summary.additionalCapacityRequired}
+                  {
+                    summary.additionalCapacityRequired
+                  }
                 </strong>{" "}
                 people.
 
@@ -448,6 +517,7 @@ function RelocationModal({ data, onClose }) {
           )}
 
       </div>
+
     </div>
   );
 }
