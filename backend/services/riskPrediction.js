@@ -1,8 +1,25 @@
 const predictRisk = ({ severity, population, type }) => {
-  const severityScore = Number(severity) || 0;
-  const populationScore = Number(population) || 0;
+  const severityScore = Math.max(
+    0,
+    Math.min(Number(severity) || 0, 100)
+  );
 
-  let populationFactor = 0;
+  const populationScore = Math.max(
+    0,
+    Number(population) || 0
+  );
+
+  const normalizedType = String(type || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+
+  /*
+   * Population Exposure Score
+   * Maximum contribution = 30
+   */
+
+  let populationFactor = 10;
 
   if (populationScore >= 10000) {
     populationFactor = 30;
@@ -12,9 +29,11 @@ const predictRisk = ({ severity, population, type }) => {
     populationFactor = 20;
   } else if (populationScore >= 500) {
     populationFactor = 15;
-  } else {
-    populationFactor = 10;
   }
+
+  /*
+   * Hazard Type Weight
+   */
 
   const typeWeights = {
     earthquake: 1.2,
@@ -23,20 +42,41 @@ const predictRisk = ({ severity, population, type }) => {
     cyclone: 1.2,
     fire: 1.05,
     storm: 1.1,
+    drought: 0.95,
+    heatwave: 1.05,
+    tsunami: 1.25,
+    avalanche: 1.15,
+    reliefcamp: 0.8,
   };
 
-  const typeKey = String(type || "").toLowerCase();
+  const typeMultiplier =
+    typeWeights[normalizedType] || 1;
 
-  const typeMultiplier = typeWeights[typeKey] || 1;
+  /*
+   * Risk Score Calculation
+   *
+   * Severity      = 70%
+   * Population    = exposure factor
+   * Hazard Type   = multiplier
+   */
+
+  const severityContribution =
+    severityScore * 0.7;
 
   const baseScore =
-    severityScore * 0.7 +
-    populationFactor;
+    severityContribution + populationFactor;
 
-  const predictedScore = Math.min(
-    Math.round(baseScore * typeMultiplier),
-    100
+  const calculatedScore =
+    baseScore * typeMultiplier;
+
+  const predictedScore = Math.max(
+    0,
+    Math.min(Math.round(calculatedScore), 100)
   );
+
+  /*
+   * Risk Classification
+   */
 
   let predictedRisk = "LOW";
 
@@ -48,16 +88,38 @@ const predictRisk = ({ severity, population, type }) => {
     predictedRisk = "MODERATE";
   }
 
+  /*
+   * Decision Support Message
+   */
+
+  let message =
+    `Predicted risk level: ${predictedRisk}`;
+
+  if (predictedRisk === "CRITICAL") {
+    message =
+      "Critical risk detected. Immediate response planning is recommended.";
+  } else if (predictedRisk === "HIGH") {
+    message =
+      "High risk detected. Priority monitoring and response planning are recommended.";
+  } else if (predictedRisk === "MODERATE") {
+    message =
+      "Moderate risk detected. Continuous monitoring is recommended.";
+  } else {
+    message =
+      "Low risk detected. Continue routine monitoring.";
+  }
+
   return {
     severity: severityScore,
     population: populationScore,
-    type,
+    type: type || "Unknown",
     predictedScore,
     predictedRisk,
-    message: `Predicted risk level: ${predictedRisk}`,
+    message,
   };
 };
 
 module.exports = {
   predictRisk,
 };
+

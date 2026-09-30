@@ -7,8 +7,16 @@ const calculateDistance = require("../utils/distance");
 
 const router = express.Router();
 
+// ==========================================
+// GET INTELLIGENT RELOCATION PLAN
+// ==========================================
+
 router.get("/:hazardId", async (req, res) => {
   try {
+    // --------------------------------------
+    // 1. FIND HAZARD
+    // --------------------------------------
+
     const hazard = await Hazard.findById(
       req.params.hazardId
     );
@@ -19,6 +27,10 @@ router.get("/:hazardId", async (req, res) => {
       });
     }
 
+    // --------------------------------------
+    // 2. FIND SAFE LOCATIONS
+    // --------------------------------------
+
     const safeLocations =
       await SafeLocation.find();
 
@@ -28,30 +40,79 @@ router.get("/:hazardId", async (req, res) => {
       });
     }
 
+    // --------------------------------------
+    // 3. BASIC HAZARD DATA
+    // --------------------------------------
+
     const population =
-      Number(hazard.population);
+      Number(hazard.population) || 0;
+
+    const hazardLatitude =
+      Number(hazard.latitude);
+
+    const hazardLongitude =
+      Number(hazard.longitude);
+
+    // --------------------------------------
+    // 4. VALIDATE HAZARD COORDINATES
+    // --------------------------------------
+
+    if (
+      !Number.isFinite(hazardLatitude) ||
+      !Number.isFinite(hazardLongitude)
+    ) {
+      return res.status(400).json({
+        message:
+          "Hazard coordinates are missing or invalid",
+      });
+    }
+
+    // --------------------------------------
+    // 5. CALCULATE DISTANCE
+    // --------------------------------------
 
     const locationsWithDistance =
       safeLocations
         .map((location) => {
+          const latitude =
+            Number(location.latitude);
+
+          const longitude =
+            Number(location.longitude);
+
+          const capacity =
+            Number(location.capacity) || 0;
+
+          const availableCapacity =
+            Number(location.availableCapacity) || 0;
+
+          // Ignore locations with invalid coordinates
+          if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude)
+          ) {
+            return null;
+          }
+
           const distance =
             calculateDistance(
-              Number(hazard.latitude),
-              Number(hazard.longitude),
-              Number(location.latitude),
-              Number(location.longitude)
+              hazardLatitude,
+              hazardLongitude,
+              latitude,
+              longitude
             );
 
           return {
-            id: location._id,
-            name: location.name,
+            locationId: location._id,
+            locationName: location.name,
             type: location.type,
-            latitude: location.latitude,
-            longitude: location.longitude,
-            capacity: Number(location.capacity),
-            availableCapacity: Number(
-              location.availableCapacity
-            ),
+
+            latitude,
+            longitude,
+
+            capacity,
+            availableCapacity,
+
             distance: Number(
               distance.toFixed(2)
             ),
@@ -59,6 +120,7 @@ router.get("/:hazardId", async (req, res) => {
         })
         .filter(
           (location) =>
+            location !== null &&
             location.availableCapacity > 0
         )
         .sort(
@@ -66,72 +128,330 @@ router.get("/:hazardId", async (req, res) => {
             a.distance - b.distance
         );
 
+    // --------------------------------------
+    // 6. TOTAL AVAILABLE CAPACITY
+    // --------------------------------------
+
+    const totalAvailableCapacity =
+      locationsWithDistance.reduce(
+        (total, location) =>
+          total +
+          location.availableCapacity,
+        0
+      );
+
+    // --------------------------------------
+    // 7. CREATE RELOCATION PLAN
+    // --------------------------------------
+
     let remainingPopulation =
       population;
 
     const relocationPlan = [];
 
-    for (const location of locationsWithDistance) {
+    for (
+      const location of locationsWithDistance
+    ) {
       if (remainingPopulation <= 0) {
         break;
       }
 
-      const peopleToRelocate = Math.min(
-        remainingPopulation,
-        location.availableCapacity
-      );
+      const peopleToRelocate =
+        Math.min(
+          remainingPopulation,
+          location.availableCapacity
+        );
+
+      const remainingCapacity =
+        location.availableCapacity -
+        peopleToRelocate;
 
       relocationPlan.push({
-        locationId: location.id,
-        locationName: location.name,
-        type: location.type,
-        distance: location.distance,
+        locationId:
+          location.locationId,
+
+        locationName:
+          location.locationName,
+
+        type:
+          location.type,
+
+        distance:
+          location.distance,
+
+        capacity:
+          location.capacity,
+
         availableCapacity:
           location.availableCapacity,
+
         peopleToRelocate,
+
+        remainingCapacity,
       });
 
       remainingPopulation -=
         peopleToRelocate;
     }
 
-    const totalRelocated =
-      population - remainingPopulation;
+    // --------------------------------------
+    // 8. RELOCATION STATISTICS
+    // --------------------------------------
 
+    const totalRelocatedPopulation =
+      population -
+      remainingPopulation;
+
+    const additionalCapacityRequired =
+      Math.max(
+        population -
+          totalAvailableCapacity,
+        0
+      );
+
+    const relocationCoverage =
+      population > 0
+        ? Number(
+            (
+              (totalRelocatedPopulation /
+                population) *
+              100
+            ).toFixed(2)
+          )
+        : 100;
+
+    // --------------------------------------
+    // 9. RELOCATION STATUS
+    // --------------------------------------
+
+    let status;
     let recommendation;
 
     if (remainingPopulation === 0) {
+      status = "COMPLETE";
+
       recommendation =
-        "Complete relocation plan available";
+        "Complete relocation plan available. Current safe-location capacity is sufficient.";
     } else {
+      status =
+        "INSUFFICIENT_CAPACITY";
+
       recommendation =
-        "Safe locations are insufficient for complete relocation";
+        "Safe-location capacity is insufficient for complete relocation. Additional emergency shelter capacity is required.";
     }
+
+    // --------------------------------------
+    // 10. RESPONSE
+    // --------------------------------------
 
     res.status(200).json({
       hazard: {
         id: hazard._id,
         name: hazard.name,
+        type: hazard.type,
+
         population,
-        riskLevel: hazard.riskLevel,
+
+        severity:
+          hazard.severity,
+
+        riskScore:
+          hazard.riskScore,
+
+        riskLevel:
+          hazard.riskLevel,
+
+        priorityScore:
+          hazard.priorityScore,
+
+        priorityLevel:
+          hazard.priorityLevel,
       },
 
-      totalAffectedPopulation:
-        population,
+      relocationSummary: {
+        totalAffectedPopulation:
+          population,
 
-      totalRelocatedPopulation:
-        totalRelocated,
+        totalAvailableCapacity,
 
-      remainingPopulation,
+        totalRelocatedPopulation,
+
+        remainingPopulation,
+
+        additionalCapacityRequired,
+
+        relocationCoverage,
+
+        status,
+      },
 
       relocationPlan,
 
       recommendation,
     });
+
   } catch (error) {
+    console.error(
+      "Relocation calculation error:",
+      error
+    );
+
     res.status(500).json({
       message:
         "Failed to calculate relocation plan",
+
+      error: error.message,
+    });
+  }
+});
+
+// ==========================================
+// CONFIRM RELOCATION
+// ==========================================
+
+router.post("/confirm", async (req, res) => {
+  try {
+    const {
+      hazardId,
+      locationId,
+      people,
+    } = req.body;
+
+    // --------------------------------------
+    // 1. VALIDATE INPUT
+    // --------------------------------------
+
+    if (
+      !hazardId ||
+      !locationId ||
+      people === undefined
+    ) {
+      return res.status(400).json({
+        message:
+          "hazardId, locationId and people are required",
+      });
+    }
+
+    const peopleToRelocate =
+      Number(people);
+
+    if (
+      !Number.isFinite(
+        peopleToRelocate
+      ) ||
+      peopleToRelocate <= 0
+    ) {
+      return res.status(400).json({
+        message:
+          "People must be a valid positive number",
+      });
+    }
+
+    // --------------------------------------
+    // 2. FIND HAZARD
+    // --------------------------------------
+
+    const hazard =
+      await Hazard.findById(
+        hazardId
+      );
+
+    if (!hazard) {
+      return res.status(404).json({
+        message:
+          "Hazard not found",
+      });
+    }
+
+    // --------------------------------------
+    // 3. FIND SAFE LOCATION
+    // --------------------------------------
+
+    const location =
+      await SafeLocation.findById(
+        locationId
+      );
+
+    if (!location) {
+      return res.status(404).json({
+        message:
+          "Safe location not found",
+      });
+    }
+
+    // --------------------------------------
+    // 4. CHECK CAPACITY
+    // --------------------------------------
+
+    const availableCapacity =
+      Number(
+        location.availableCapacity
+      ) || 0;
+
+    if (
+      peopleToRelocate >
+      availableCapacity
+    ) {
+      return res.status(400).json({
+        message:
+          "Insufficient safe-location capacity",
+
+        availableCapacity,
+
+        requested:
+          peopleToRelocate,
+      });
+    }
+
+    // --------------------------------------
+    // 5. UPDATE CAPACITY
+    // --------------------------------------
+
+    location.availableCapacity =
+      availableCapacity -
+      peopleToRelocate;
+
+    await location.save();
+
+    // --------------------------------------
+    // 6. RESPONSE
+    // --------------------------------------
+
+    res.status(200).json({
+      message:
+        "Relocation confirmed successfully",
+
+      relocation: {
+        hazardId:
+          hazard._id,
+
+        hazardName:
+          hazard.name,
+
+        locationId:
+          location._id,
+
+        locationName:
+          location.name,
+
+        peopleRelocated:
+          peopleToRelocate,
+
+        remainingCapacity:
+          location.availableCapacity,
+      },
+    });
+
+  } catch (error) {
+    console.error(
+      "Confirm relocation error:",
+      error
+    );
+
+    res.status(500).json({
+      message:
+        "Failed to confirm relocation",
+
       error: error.message,
     });
   }
