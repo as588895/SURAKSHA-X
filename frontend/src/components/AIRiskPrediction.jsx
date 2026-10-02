@@ -69,7 +69,7 @@ return ( <section className="section ai-risk-section">
     </div>
   )}
 
-  {/* ================= ERROR ================= */}
+  {/* =================LOADING & ERROR ================= */}
 
   {!loading && error && (
     <div className="form-error">
@@ -145,7 +145,7 @@ return ( <section className="section ai-risk-section">
 
         </div>
 
-        {/* RISK */}
+        {/*  RISK  */}
 
         <div
           className={getRiskClass(
