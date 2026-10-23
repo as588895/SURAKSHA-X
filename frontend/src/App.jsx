@@ -3,6 +3,7 @@ import axios from "axios";
 
 import Map from "./Map";
 import "./App.css";
+import AuthScreen from "./components/AuthScreen";
 
 // ================= COMPONENTS =================
 
@@ -80,6 +81,11 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 // =========================================================
 
 function App() {
+  const [authUser, setAuthUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("surakshaXUser") || "null"); }
+    catch { return null; }
+  });
+  const handleLogout = () => { localStorage.removeItem("surakshaXUser"); setAuthUser(null); };
   // =========================================================
   // CORE DATA
   // =========================================================
@@ -815,16 +821,52 @@ function App() {
     .reduce((total, hazard) => total + Number(hazard.population || 0), 0);
 
   // =========================================================
+  // AUTHENTICATION GATE
+  // =========================================================
+  if (!authUser) return <AuthScreen onAuthenticated={setAuthUser} />;
+
+  // =========================================================
   // MAIN UI
   // =========================================================
-
   return (
-    <div className="app">
-      {/* ================= NAVBAR ================= */}
-
-      <Navbar />
-
-      <main className="container">
+    <div className="app app-shell">
+      <aside className="sx-sidebar">
+        <a className="sx-brand" href="#overview" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+          <span className="sx-brand-mark">✦</span><span><strong>SURAKSHA<span>-X</span></strong><small>DISASTER INTELLIGENCE</small></span>
+        </a>
+        <div className="sx-nav-label">WORKSPACE</div>
+        <nav className="sx-nav">
+          <a className="active" href="#overview"><span>▦</span> Overview</a>
+          <a href="#hazard-form"><span>＋</span> Report Hazard</a>
+          <a href="#hazard-database"><span>⌕</span> Hazard Database</a>
+          <a href="#hazard-map"><span>⌖</span> Live Risk Map</a>
+          <a href="#risk-intelligence"><span>✧</span> AI Risk Intelligence</a>
+          <a href="#analytics"><span>▥</span> Analytics</a>
+          <a href="#safe-zones"><span>⌂</span> Safe Zones & Relief</a>
+          <a href="#report-center"><span>▤</span> Reports</a>
+        </nav>
+        <div className="sx-sidebar-bottom"><div className="sx-profile-avatar">{String(authUser.name || authUser.email || "U").charAt(0).toUpperCase()}</div><div className="sx-profile-text"><strong>{authUser.name || "System User"}</strong><small>{authUser.email}</small></div><button type="button" className="sx-logout" onClick={handleLogout} title="Log out">↪</button></div>
+      </aside>
+      <div className="sx-workspace">
+        <header className="sx-topbar">
+          <div className="sx-topbar-title"><span className="sx-top-icon">⌖</span><div><strong>Hazard Detection & Relocation</strong><small><i className="sx-online-dot" /> System workspace active</small></div></div>
+          <div className="sx-topbar-right"><span className="sx-live-pill"><i /> Live monitoring</span><span className="sx-user-chip">{String(authUser.name || authUser.email || "U").charAt(0).toUpperCase()}</span><button className="sx-top-logout" onClick={handleLogout}>Log out</button></div>
+        </header>
+        <main className="container workspace-container">
+          <section className="sx-welcome" id="overview">
+            <div className="sx-welcome-copy"><span className="sx-eyebrow"><i /> DISASTER RESPONSE CONTROL CENTER</span><h1>Stay ahead of <span>every risk.</span></h1><p>Monitor hazards, understand risk levels, and coordinate safer relocations from one intelligent workspace.</p><div className="sx-feature-pills"><span>✦ Risk intelligence</span><span>⌖ Geospatial monitoring</span><span>✓ Relocation planning</span></div></div>
+            <div className="sx-welcome-actions"><button className="sx-primary-action" onClick={() => document.getElementById("hazard-form")?.scrollIntoView({ behavior: "smooth" })}>＋ Report a hazard <span>→</span></button><button className="sx-secondary-action" onClick={manualRefresh} disabled={refreshing}>{refreshing ? "Refreshing…" : "⟳ Refresh dashboard"}</button></div>
+            <div className="sx-welcome-orb sx-orb-one" /><div className="sx-welcome-orb sx-orb-two" />
+          </section>
+          <section className="sx-kpi-grid" aria-label="System overview">
+            <article className="sx-kpi-card"><span className="sx-kpi-icon blue">⌖</span><span className="sx-kpi-label">Total hazards</span><strong>{dashboardStats.totalHazards ?? hazards.length}</strong><small>Tracked in the system</small></article>
+            <article className="sx-kpi-card"><span className="sx-kpi-icon red">⚠</span><span className="sx-kpi-label">Critical risks</span><strong>{criticalPriorityCount}</strong><small>Require urgent attention</small></article>
+            <article className="sx-kpi-card"><span className="sx-kpi-icon amber">⌁</span><span className="sx-kpi-label">High-risk zones</span><strong>{highPriorityCount}</strong><small>Priority response needed</small></article>
+            <article className="sx-kpi-card"><span className="sx-kpi-icon green">♙</span><span className="sx-kpi-label">People at risk</span><strong>{Number(dashboardStats.totalAffectedPopulation ?? emergencyPopulation).toLocaleString("en-IN")}</strong><small>Across identified hazards</small></article>
+          </section>
+          <div className="sx-section-intro"><div><span className="sx-eyebrow dark">YOUR RESPONSE OVERVIEW</span><h2>Operational dashboard</h2></div><span className="sx-updated">Last sync: {lastUpdated || "Syncing…"}</span></div>
+      {/* Existing operational modules */}
+      <div className="sx-legacy-content">
         {/* ================= HERO ================= */}
 
         <HeroSection
@@ -867,17 +909,17 @@ function App() {
 
         {/* ================= ANALYTICS ================= */}
 
-        <AnalyticsDashboard hazards={hazards} />
+        <div id="analytics"><AnalyticsDashboard hazards={hazards} /></div>
 
         {/* ================= RISK INTELLIGENCE ================= */}
 
-        <RiskIntelligence
+        <div id="risk-intelligence"><RiskIntelligence
           hazards={hazards}
           predictions={riskPredictions}
           loading={riskPredictionLoading}
           error={riskPredictionError}
           onRelocation={openRelocation}
-        />
+        /></div>
 
         {/* ================= AI PREDICTION ================= */}
 
@@ -956,7 +998,7 @@ function App() {
 
         {/* ================= DATABASE ================= */}
 
-        <HazardDatabase
+        <div id="hazard-database"><HazardDatabase
           hazards={filteredHazards}
           totalHazards={hazards.length}
           loading={loading}
@@ -973,11 +1015,11 @@ function App() {
           onRelocation={openRelocation}
           onDelete={deleteHazard}
           loadingRelocation={loadingRelocation}
-        />
+        /></div>
 
         {/* ================= SAFE LOCATIONS ================= */}
 
-        <section className="section safe-location-section">
+        <section className="section safe-location-section" id="safe-zones">
           <div className="section-heading">
             <div>
               <div className="section-kicker">EVACUATION NETWORK</div>
@@ -1043,12 +1085,14 @@ function App() {
 
         {/* ================= REPORT CENTER ================= */}
 
-        <ReportCenter hazards={hazards} />
+        <div id="report-center"><ReportCenter hazards={hazards} /></div>
 
         {/* ================= FOOTER ================= */}
 
         <Footer />
+      </div>
       </main>
+      </div>
 
       {/* ================= UPDATE MODAL ================= */}
 
