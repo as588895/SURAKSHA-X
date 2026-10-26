@@ -40,7 +40,9 @@ import SafeLocationForm from "./components/SafeLocationForm";
 // ================= API =================
 
 // const API = "http://localhost:5000/api";
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = import.meta.env.PROD
+  ? "https://suraksha-x-backend.onrender.com/api"
+  : "http://localhost:5000/api";
 
 // ================= EMPTY FORM =================
 
